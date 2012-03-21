@@ -176,8 +176,56 @@ requirejs(["../../src/rigid_body", "thorn-math"], function(RigidBody, Mathematic
 			expect(this.body.getMass()).toBe(10);
 		});
 
-		it("should do the integration step of the body", function(){
-			//TODO: Test this.
+		it("should not update anything when the body is asleep", function(){
+			this.body.sleep();
+			this.body.setMass(1);
+			this.body.velocity.set(1, 1, 1);
+			this.body.angular_velocity.set(1, 1, 1);
+			this.body.integrate(1);
+			expect(this.body.position.x).toBe(0);
+			expect(this.body.position.y).toBe(0);
+			expect(this.body.position.z).toBe(0);
+			expect(this.body.orientation.r).toBe(1);
+			expect(this.body.orientation.i).toBe(0);
+			expect(this.body.orientation.j).toBe(0);
+			expect(this.body.orientation.k).toBe(0);
+		});
+
+		it("should update the position and orientation when the body is awake", function(){
+			var q = new Mathematics.Quaternion();
+			q.addVector(new Mathematics.Vector3D(1 * RigidBody.ANGULAR_DAMPING, 1 * RigidBody.ANGULAR_DAMPING, 1 * RigidBody.ANGULAR_DAMPING)).normalize();
+			this.body.angular_velocity.set(1, 1, 1);
+			this.body.setMass(1);
+			this.body.accumulatedForce.set(1, 1, 1);
+			this.body.integrate(1);
+			expect(Math.round(this.body.position.x)).toBe(Math.round(1*RigidBody.LINEAR_DAMPING));
+			expect(Math.round(this.body.position.y)).toBe(Math.round(1*RigidBody.LINEAR_DAMPING));
+			expect(Math.round(this.body.position.z)).toBe(Math.round(1*RigidBody.LINEAR_DAMPING));
+			expect(this.body.orientation.r).toBe(q.r);
+			expect(this.body.orientation.i).toBe(q.i);
+			expect(this.body.orientation.j).toBe(q.j);
+			expect(this.body.orientation.k).toBe(q.k);
+			expect(this.body.lastFrameAcceleration.x).toBe(1);
+			expect(this.body.lastFrameAcceleration.y).toBe(1);
+			expect(this.body.lastFrameAcceleration.z).toBe(1);
+			expect(this.body.acceleration.x).toBe(0);
+			expect(this.body.acceleration.y).toBe(0);
+			expect(this.body.acceleration.z).toBe(0);
+			this.body.integrate(1);
+			q.addVector(new Mathematics.Vector3D(1 * RigidBody.ANGULAR_DAMPING, 1 * RigidBody.ANGULAR_DAMPING, 1 * RigidBody.ANGULAR_DAMPING)).normalize();
+			expect(Math.round(this.body.position.x)).toBe(Math.round(2 * RigidBody.LINEAR_DAMPING));
+			expect(Math.round(this.body.position.y)).toBe(Math.round(2 * RigidBody.LINEAR_DAMPING));
+			expect(Math.round(this.body.position.z)).toBe(Math.round(2 * RigidBody.LINEAR_DAMPING));
+			expect(Math.round(this.body.orientation.r)).toBe(Math.round(q.r));
+			expect(Math.round(this.body.orientation.i)).toBe(Math.round(q.i));
+			expect(Math.round(this.body.orientation.j)).toBe(Math.round(q.j));
+			expect(Math.round(this.body.orientation.k)).toBe(Math.round(q.k));
+			expect(this.body.lastFrameAcceleration.x).toBe(0);
+			expect(this.body.lastFrameAcceleration.y).toBe(0);
+			expect(this.body.lastFrameAcceleration.z).toBe(0);
+			expect(this.body.acceleration.x).toBe(0);
+			expect(this.body.acceleration.y).toBe(0);
+			expect(this.body.acceleration.z).toBe(0);
 		});
 
 		//TODO: Activate when the primitives are added.

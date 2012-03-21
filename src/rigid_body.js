@@ -237,9 +237,7 @@ define(["thorn-math"], function(Mathematics) {
 			if (!this.isAwake) return;
 
 			//Calculate linear acceleration
-			this.lastFrameAcceleration.x = this.acceleration.x;
-			this.lastFrameAcceleration.y = this.acceleration.y;
-			this.lastFrameAcceleration.z = this.acceleration.z;
+			this.acceleration.clone(this.lastFrameAcceleration);
 			this.lastFrameAcceleration.add(this.accumulatedForce.scale(this.inverseMass, this.__helperVector));
 			//Calculate the angular acceleration from toques.
 			this.inverseInertiaTensorWorld.transformVector(this.accumulatedTorque, this.__helperVector);
@@ -247,8 +245,8 @@ define(["thorn-math"], function(Mathematics) {
 			this.angular_velocity.add(this.__helperVector.scale(duration));
 			this.velocity.add(this.lastFrameAcceleration.scale(duration, this.__helperVector));
 			//Impose drag
-			this.velocity.scale(Math.pow(RigidBody.linearDamping, duration));
-			this.angular_velocity.scale(Math.pow(RigidBody.angularDamping, duration));
+			this.velocity.scale(Math.pow(RigidBody.LINEAR_DAMPING, duration));
+			this.angular_velocity.scale(Math.pow(RigidBody.ANGULAR_DAMPING, duration));
 			//Clear forces for the next integration step
 			this.clear();
 
