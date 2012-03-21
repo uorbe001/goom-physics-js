@@ -25,9 +25,9 @@ define(["thorn-math"], function(Mathematics) {
 		@property {Boolean} canSleep Wether this body is allowed to sleep or not, some bodies can never fall asleep.
 		@property {Number} motion Ammount of motion of the body. Used to put bodies to sleep.
 		@property {Array} primitives The list of primitives in this body, used for narrow phase collision detection.
-		@property {Physics.BoundingVolumeHierarchyNode} boundingVolumeHierarchyNode BVHNodes are used in broad-phase 
+		@property {Physics.BoundingVolumeHierarchyNode} boundingVolumeHierarchyNode BVHNodes are used in broad-phase
 		collision detection, rigid bodies will hold a reference to the one holding them in order to notify them on position changes.
-		@property {Mathematics.Vector3D} __helperVector This vector is used in a few functions as a local variable, 
+		@property {Mathematics.Vector3D} __helperVector This vector is used in a few functions as a local variable,
 			it is defined as a class variable to avoid the creation of objects at runtime.
 		@param {Mathematics.Vector3D} [position=(0,0,0)] The position of the object in world space.
 		@param {Mathematics.Quaternion} [orientation=(1,0,0,0)] Angular orientation of the body.
@@ -57,7 +57,6 @@ define(["thorn-math"], function(Mathematics) {
 			this.__helperVector = new Mathematics.Vector3D();
 		}
 
-
 		/**
 			Sets the inertia tensor for this body, stored in the inverse inertia tensor
 			variable.
@@ -86,14 +85,13 @@ define(["thorn-math"], function(Mathematics) {
 		RigidBody.prototype.calculateInternalData = function() {
 			this.orientation.normalize();
 			//Calculate the transform matrix for this body.
-			this._calculateTransformMatrix();
+			this.transformationMatrix.makeFromPositionAndOrientation(this.position, this.orientation);
 			//Calculate the inertia tensor in world space.
-			this._transformInertiaTensor();
-
+			this.transformationMatrix.transformMatrix3D(this.inverseInertiaTensor, this.inverseInertiaTensorWorld);
 			//Update the primitives in this body.
 			_ref = this.primitives;
-			for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-				primitive = _ref[_i];
+			for (var i = 0, len = _ref.length; i < len; i++) {
+				primitive = _ref[i];
 				primitive.calculateInternalData();
 			}
 
@@ -116,40 +114,6 @@ define(["thorn-math"], function(Mathematics) {
 			this.isAwake = false;
 			this.velocity.zero();
 			this.angular_velocity.zero();
-		};
-
-		/**
-			Calculates the transformation matrix data from the position and orientation state
-			data.
-			@inner
-		*/
-		RigidBody.prototype._calculateTransformMatrix = function() {
-			this.transformationMatrix.makeFromPositionAndOrientation(this.position, this.orientation);
-		};
-
-		/**
-			Internal function to add inertia tensor transform by Mathematics.Quaternion.
-			@inner
-		*/
-		RigidBody.prototype._transformInertiaTensor = function() {
-			var t1 = this.transformationMatrix.data[0] * this.inverseInertiaTensor.data[0] + this.transformationMatrix.data[4] * this.inverseInertiaTensor.data[1] + this.transformationMatrix.data[8] * this.inverseInertiaTensor.data[2];
-			var t2 = this.transformationMatrix.data[0] * this.inverseInertiaTensor.data[3] + this.transformationMatrix.data[4] * this.inverseInertiaTensor.data[4] + this.transformationMatrix.data[8] * this.inverseInertiaTensor.data[5];
-			var t3 = this.transformationMatrix.data[0] * this.inverseInertiaTensor.data[6] + this.transformationMatrix.data[4] * this.inverseInertiaTensor.data[7] + this.transformationMatrix.data[8] * this.inverseInertiaTensor.data[8];
-			var t4 = this.transformationMatrix.data[1] * this.inverseInertiaTensor.data[0] + this.transformationMatrix.data[5] * this.inverseInertiaTensor.data[1] + this.transformationMatrix.data[9] * this.inverseInertiaTensor.data[2];
-			var t5 = this.transformationMatrix.data[1] * this.inverseInertiaTensor.data[3] + this.transformationMatrix.data[5] * this.inverseInertiaTensor.data[4] + this.transformationMatrix.data[9] * this.inverseInertiaTensor.data[5];
-			var t6 = this.transformationMatrix.data[1] * this.inverseInertiaTensor.data[6] + this.transformationMatrix.data[5] * this.inverseInertiaTensor.data[7] + this.transformationMatrix.data[9] * this.inverseInertiaTensor.data[8];
-			var t7 = this.transformationMatrix.data[2] * this.inverseInertiaTensor.data[0] + this.transformationMatrix.data[6] * this.inverseInertiaTensor.data[1] + this.transformationMatrix.data[10] * this.inverseInertiaTensor.data[2];
-			var t8 = this.transformationMatrix.data[2] * this.inverseInertiaTensor.data[3] + this.transformationMatrix.data[6] * this.inverseInertiaTensor.data[4] + this.transformationMatrix.data[10] * this.inverseInertiaTensor.data[5];
-			var t9 = this.transformationMatrix.data[2] * this.inverseInertiaTensor.data[6] + this.transformationMatrix.data[6] * this.inverseInertiaTensor.data[7] + this.transformationMatrix.data[10] * this.inverseInertiaTensor.data[8];
-			this.inverseInertiaTensorWorld.data[0] = t1 * this.transformationMatrix.data[0] + t2 * this.transformationMatrix.data[4] + t3 * this.transformationMatrix.data[8];
-			this.inverseInertiaTensorWorld.data[1] = t4 * this.transformationMatrix.data[0] + t5 * this.transformationMatrix.data[4] + t6 * this.transformationMatrix.data[8];
-			this.inverseInertiaTensorWorld.data[2] = t7 * this.transformationMatrix.data[0] + t8 * this.transformationMatrix.data[4] + t9 * this.transformationMatrix.data[8];
-			this.inverseInertiaTensorWorld.data[3] = t1 * this.transformationMatrix.data[1] + t2 * this.transformationMatrix.data[5] + t3 * this.transformationMatrix.data[9];
-			this.inverseInertiaTensorWorld.data[4] = t4 * this.transformationMatrix.data[1] + t5 * this.transformationMatrix.data[5] + t6 * this.transformationMatrix.data[9];
-			this.inverseInertiaTensorWorld.data[5] = t7 * this.transformationMatrix.data[1] + t8 * this.transformationMatrix.data[5] + t9 * this.transformationMatrix.data[9];
-			this.inverseInertiaTensorWorld.data[6] = t1 * this.transformationMatrix.data[2] + t2 * this.transformationMatrix.data[6] + t3 * this.transformationMatrix.data[10];
-			this.inverseInertiaTensorWorld.data[7] = t4 * this.transformationMatrix.data[2] + t5 * this.transformationMatrix.data[6] + t6 * this.transformationMatrix.data[10];
-			this.inverseInertiaTensorWorld.data[8] = t7 * this.transformationMatrix.data[2] + t8 * this.transformationMatrix.data[6] + t9 * this.transformationMatrix.data[10];
 		};
 
 		/**
@@ -177,7 +141,7 @@ define(["thorn-math"], function(Mathematics) {
 
 		/**
 			Applies a force to the gien point in the body, both the force is expected to be
-			given in world coordinates, but the point in object coordinates. 
+			given in world coordinates, but the point in object coordinates.
 			@param {Mathematics.Vector3D} force The force to be applied to this body.
 			@param {Mathematics.Vector3D} point The point in object coordinates where the force is applied.
 		*/
