@@ -1,7 +1,7 @@
 var requirejs = require("requirejs");
 requirejs.config({nodeRequire: require});
 
-requirejs(["../../src/rigid_body", "thorn-math"], function(RigidBody, Mathematics) {
+requirejs(["../../src/rigid_body", "goom-math"], function(RigidBody, Mathematics) {
 	describe("RigidBody", function() {
 		beforeEach(function() {
 			this.body = new RigidBody();

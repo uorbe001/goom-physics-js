@@ -1,7 +1,7 @@
 var requirejs = require("requirejs");
 requirejs.config({nodeRequire: require});
 
-requirejs(["../../src/gravity", "../../src/rigid_body", "thorn-math"], function(Gravity, RigidBody, Mathematics) {
+requirejs(["../../src/gravity", "../../src/rigid_body", "goom-math"], function(Gravity, RigidBody, Mathematics) {
 	describe('Gravity', function() {
 		beforeEach(function() {
 			var force = new Mathematics.Vector3D(0, -10, 0);

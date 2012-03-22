@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(["thorn-math"], function(Mathematics) {
+define(["goom-math"], function(Mathematics) {
 	/**
 		Creates a RigidBody.
 		@class This is the basic rigid body class used for physics simulations.

@@ -10,7 +10,7 @@ var config = {
 	findNestedDependencies: true,
 	modules: [
 		{
-			name: "thorn-physics"
+			name: "goom-physics"
 		}
 	]
 };
@@ -44,7 +44,7 @@ task("build", function(params){
 		fs.unlink('dist/primitives.js');
 		fs.unlink('dist/world.js');
 		fs.unlink('dist/rigid_body.js');
-		fs.rename('dist/thorn-math.js', 'dist/thorn-physics.min.js');
-		console.log("The file is ready at dist/thron-physics.min.js");
+		fs.rename('dist/goom-math.js', 'dist/goom-physics.min.js');
+		console.log("The file is ready at dist/goom-physics.min.js");
 	});
 });

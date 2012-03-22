@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(["thorn-math", "./force_generator"], function(Mathematics, ForceGenerator) {
+define(["goom-math", "./force_generator"], function(Mathematics, ForceGenerator) {
 	var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
 		for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
 		function ctor() { this.constructor = child; }
