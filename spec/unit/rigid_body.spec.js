@@ -1,7 +1,7 @@
 var requirejs = require("requirejs");
 requirejs.config({nodeRequire: require});
 
-requirejs(["../../src/rigid_body", "goom-math"], function(RigidBody, Mathematics) {
+requirejs(["../../src/rigid_body", "goom-math", "../../src/primitives"], function(RigidBody, Mathematics, Primitives) {
 	describe("RigidBody", function() {
 		beforeEach(function() {
 			this.body = new RigidBody();
@@ -228,32 +228,31 @@ requirejs(["../../src/rigid_body", "goom-math"], function(RigidBody, Mathematics
 			expect(this.body.acceleration.z).toBe(0);
 		});
 
-		//TODO: Activate when the primitives are added.
-		xit("should add proper primitives to the body when addPrimitives is called", function() {
+		it("should add proper primitives to the body when addPrimitives is called", function() {
 			this.body.addPrimitives({type: "sphere", radious: 2, offset: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]});
 			expect(this.body.primitives.length).toBe(1);
-			expect(this.body.primitives[0] instanceof Physics.Primitives.Sphere).toBeTruthy();
+			expect(this.body.primitives[0] instanceof Primitives.Sphere).toBeTruthy();
 			expect(this.body.primitives[0].body).toBe(this.body);
 			
-			var body2 = new Physics.RigidBody();
+			var body2 = new RigidBody();
 			body2.addPrimitives([{type: "sphere", radious: 2, offset: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]}, {type: "box", halfSize: {x: 10, y: 5, z: 5}, offset: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1]}]);
 			expect(body2.primitives.length).toBe(2);
-			expect(body2.primitives[0] instanceof Physics.Primitives.Sphere).toBeTruthy();
-			expect(body2.primitives[1] instanceof Physics.Primitives.Box).toBeTruthy();
+			expect(body2.primitives[0] instanceof Primitives.Sphere).toBeTruthy();
+			expect(body2.primitives[1] instanceof Primitives.Box).toBeTruthy();
 			expect(body2.primitives[0].body).toBe(body2);
 			expect(body2.primitives[1].body).toBe(body2);
 
-			this.body = new Physics.RigidBody();
+			this.body = new RigidBody();
 			this.body.addPrimitives({type: "sphere", radious: 2});
 			expect(this.body.primitives.length).toBe(1);
-			expect(this.body.primitives[0] instanceof Physics.Primitives.Sphere).toBeTruthy();
+			expect(this.body.primitives[0] instanceof Primitives.Sphere).toBeTruthy();
 			expect(this.body.primitives[0].body).toBe(this.body);
 
-			body2 = new Physics.RigidBody();
+			body2 = new RigidBody();
 			body2.addPrimitives([{type: "sphere", radious: 2}, {type: "box", halfSize: {x: 10,y: 5,z: 5}}]);
 			expect(body2.primitives.length).toBe(2);
-			expect(body2.primitives[0] instanceof Physics.Primitives.Sphere).toBeTruthy();
-			expect(body2.primitives[1] instanceof Physics.Primitives.Box).toBeTruthy();
+			expect(body2.primitives[0] instanceof Primitives.Sphere).toBeTruthy();
+			expect(body2.primitives[1] instanceof Primitives.Box).toBeTruthy();
 			expect(body2.primitives[0].body).toBe(body2);
 			expect(body2.primitives[1].body).toBe(body2);
 		});

@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(["goom-math"], function(Mathematics) {
+define(["goom-math", "./primitives"], function(Mathematics, Primitives) {
 	/**
 		Creates a RigidBody.
 		@class This is the basic rigid body class used for physics simulations.
@@ -202,10 +202,10 @@ define(["goom-math"], function(Mathematics) {
 			if (!(primitive_data instanceof Array)) {
 				switch (primitive_data.type.toLowerCase()) {
 					case 'sphere':
-						this.primitives.push(new Physics.Primitives.Sphere(this, primitive_data.radious, primitive_data.offset !== null || primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(primitive_data.offset): null));
+						this.primitives.push(new Primitives.Sphere(this, primitive_data.radious, primitive_data.offset !== null && primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(primitive_data.offset): null));
 						break;
 					case 'box':
-						this.primitives.push(new Physics.Primitives.Box(this, new Mathematics.Vector3D(primitive_data.halfSize.x, primitive_data.halfSize.y, primitive_data.halfSize.z), primitive_data.offset !== null || primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(primitive_data.offset): null));
+						this.primitives.push(new Primitives.Box(this, new Mathematics.Vector3D(primitive_data.halfSize.x, primitive_data.halfSize.y, primitive_data.halfSize.z), primitive_data.offset !== null && primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(primitive_data.offset): null));
 						break;
 					default:
 						throw "Unkwnown primitive type";
@@ -218,10 +218,10 @@ define(["goom-math"], function(Mathematics) {
 				one_primitive_data = primitive_data[i];
 				switch (one_primitive_data.type.toLowerCase()) {
 					case 'sphere':
-						this.primitives.push(new Physics.Primitives.Sphere(this, one_primitive_data.radious, one_primitive_data.offset !== null || primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(one_primitive_data.offset) : null));
+						this.primitives.push(new Primitives.Sphere(this, one_primitive_data.radious, one_primitive_data.offset !== null && primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(one_primitive_data.offset) : null));
 						break;
 					case 'box':
-						this.primitives.push(new Physics.Primitives.Box(this, new Mathematics.Vector3D(one_primitive_data.halfSize.x, one_primitive_data.halfSize.y, one_primitive_data.halfSize.z), one_primitive_data.offset !== null || primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(one_primitive_data.offset): null));
+						this.primitives.push(new Primitives.Box(this, new Mathematics.Vector3D(one_primitive_data.halfSize.x, one_primitive_data.halfSize.y, one_primitive_data.halfSize.z), one_primitive_data.offset !== null && primitive_data.offset !== undefined? (new Mathematics.Matrix4D()).set(one_primitive_data.offset): null));
 						break;
 					default:
 						throw "Unkwnown primitive type";
