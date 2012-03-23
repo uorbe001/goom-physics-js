@@ -1,7 +1,7 @@
 var requirejs = require("requirejs");
 requirejs.config({nodeRequire: require});
 
-requirejs(["../../src/rigid_body", "goom-math", "../../src/primitives"], function(RigidBody, Mathematics, Primitives) {
+requirejs(["../../src/rigid_body", "goom-math", "../../src/primitives", "../../src/bounding_volume_hierarchy_node"], function(RigidBody, Mathematics, Primitives, BoundingVolumeHierarchyNode) {
 	describe("RigidBody", function() {
 		beforeEach(function() {
 			this.body = new RigidBody();
@@ -27,7 +27,13 @@ requirejs(["../../src/rigid_body", "goom-math", "../../src/primitives"], functio
 		});
 
 		it("should call all the functions used to update internal data when calculateInternalData is used", function() {
+			var v = new BoundingVolumeHierarchyNode(null, this.body);
+			spyOn(v, "updateHierarchy").andCallThrough();
+			this.body.addPrimitives({type: "sphere", radious: 2});
+			spyOn(this.body.primitives[0], "calculateInternalData").andCallThrough();
+
 			this.body.calculateInternalData();
+
 			var mat = new Mathematics.Matrix4D();
 			mat.makeFromPositionAndOrientation(this.body.position, this.body.orientation);
 			for (var i = 0; i <= 15; i++) {
@@ -39,8 +45,9 @@ requirejs(["../../src/rigid_body", "goom-math", "../../src/primitives"], functio
 			for (i = 0; i <= 8; i++) {
 				expect(this.body.inverseInertiaTensorWorld.data[i]).toBe(mat.data[i]);
 			}
-			//TODO: BoundingVolumeHierarchyNode is updated?
-			//TODO: What about the primitives, are they being updated?
+			
+			expect(v.updateHierarchy).toHaveBeenCalled();
+			expect(this.body.primitives[0].calculateInternalData).toHaveBeenCalled();
 		});
 
 		it("should increase the motion when waking up the body", function() {

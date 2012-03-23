@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(["goom-math", "./primitives"], function(Mathematics, Primitives) {
+define(["goom-math", "./primitives", "./bounding_volume_hierarchy_node"], function(Mathematics, Primitives) {
 	/**
 		Creates a RigidBody.
 		@class This is the basic rigid body class used for physics simulations.
