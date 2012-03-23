@@ -31,6 +31,31 @@ requirejs(["goom-math", "../../src/bounding_sphere"], function(Mathematics, Boun
 			expect(s3.position.z).toBe(0);
 		});
 
+		it("should make the bounding sphere fit the the two given spheres", function() {
+			var s2 = new BoundingSphere(new Mathematics.Vector3D(1, 0, 0), 1);
+			var s3 = new BoundingSphere(new Mathematics.Vector3D(1, 0, 0), 1);
+			s3.fitSpheres(this.s, s2);
+			expect(s3.radious).toBe(1.5);
+			expect(s3.position.x).toBe(0.5);
+			expect(s3.position.y).toBe(0);
+			expect(s3.position.z).toBe(0);
+
+			s2 = new BoundingSphere(new Mathematics.Vector3D(1, 0, 0), 2);
+			s3.fitSpheres(this.s, s2);
+			expect(s3.radious).toBe(2);
+			expect(s3.position.x).toBe(1);
+			expect(s3.position.y).toBe(0);
+			expect(s3.position.z).toBe(0);
+
+			this.s.radious = 2;
+			s2 = new BoundingSphere(new Mathematics.Vector3D(1, 0, 0), 1);
+			s3.fitSpheres(this.s, s2);
+			expect(s3.radious).toBe(2);
+			expect(s3.position.x).toBe(0);
+			expect(s3.position.y).toBe(0);
+			expect(s3.position.z).toBe(0);
+		});
+
 		it('should say the spheres are overlapping when they are', function() {
 			var s2 = new BoundingSphere(new Mathematics.Vector3D(2, 0, 0), 1.1);
 			expect(this.s.overlaps(s2)).toBeTruthy();

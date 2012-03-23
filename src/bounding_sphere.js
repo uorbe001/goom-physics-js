@@ -29,6 +29,7 @@ define(["goom-math"], function(Mathematics) {
 			@returns {Physics.BoundingSphere} The constructed BoundingSphere.
 		*/
 		BoundingSphere.createfromSpheres = function(sphere_one, sphere_two) {
+			var position, radious;
 			var center_offset = new Mathematics.Vector3D();
 			sphere_two.position.substract(sphere_one.position, center_offset);
 			var distance = center_offset.squaredMagnitude();
@@ -50,6 +51,39 @@ define(["goom-math"], function(Mathematics) {
 			}
 
 			return new BoundingSphere(position, radious);
+		};
+
+		/**
+			Makes this BoundingSphere enclose the two given spheres.
+			@param {Physiscs.BoundingSphere} sphere_one The first bounding sphere to enclose.
+			@param {Physiscs.BoundingSphere} sphere_two The second bounding sphere to enclose.
+		*/
+		BoundingSphere.prototype.fitSpheres = function(sphere_one, sphere_two) {
+			var x = sphere_two.position.x - sphere_one.position.x,
+				y = sphere_two.position.y - sphere_one.position.y,
+				z = sphere_two.position.z - sphere_one.position.z;
+			var distance = x * x + y * y + z * z;
+			var radious_diff = sphere_two.radious - sphere_one.radious;
+
+			if ((radious_diff * radious_diff) >= distance) {
+				if (sphere_one.radious > sphere_two.radious) {
+					sphere_one.position.clone(this.position);
+					this.radious = sphere_one.radious;
+				} else {
+					sphere_two.position.clone(this.position);
+					this.radious = sphere_two.radious;
+				}
+			} else {
+				distance = Math.sqrt(distance);
+				this.radious = (distance + sphere_one.radious + sphere_two.radious) * 0.5;
+				sphere_one.position.clone(this.position);
+				if (distance > 0) {
+					var s = (this.radious - sphere_one.radious) / distance;
+					this.position.x += x * s;
+					this.position.y += y * s;
+					this.position.z += z * s;
+				}
+			}
 		};
 
 		/**

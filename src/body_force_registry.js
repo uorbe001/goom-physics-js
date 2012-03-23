@@ -8,8 +8,8 @@ define(["goom-math", "./force_generator", "./rigid_body"], function(Mathematics)
 		@class This class is used to register the force generators that affect ay given particles
 		in the physics engine.
 		@exports BodyForceRegistry as Physics.BodyForceRegistry.
-		@property {Array} registrations An array holding the body and force generator pairs, 
-		will hold the pair as an object with a body key to the rigid body and a			
+		@property {Array} registrations An array holding the body and force generator pairs,
+		will hold the pair as an object with a body key to the rigid body and a
 		forceGenerator key to the ForceGenerator.
 	*/
 	var BodyForceRegistry = (function() {
