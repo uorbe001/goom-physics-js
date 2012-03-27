@@ -51,19 +51,21 @@ define(["goom-math"], function(Mathematics) {
 		};
 
 		/**
-			Returns the position vector from the body origin. 
+			Returns the position vector from the body origin.
+			@param {Mathematics.Vector3D} destination The vector where result is stored.
 			@returns {Mathematics.Vector3D} The position vector from the origin.
 		*/
-		Primitive.prototype.position = function() {
-			return this.transformationMatrix.axisVector(3);
+		Primitive.prototype.position = function(destination) {
+			return this.transformationMatrix.axisVector(3, destination);
 		};
 
 		/**
 			Rerturns the axis vector from the transformation matrix.
+			@param {Mathematics.Vector3D} destination The vector where result is stored.
 			@returns {Mathematics.Vector3D} axis vector.
 		*/
-		Primitive.prototype.axisVector = function(index) {
-			return this.transformationMatrix.axisVector(index);
+		Primitive.prototype.axisVector = function(index, destination) {
+			return this.transformationMatrix.axisVector(index, destination);
 		};
 
 		Primitives.Primitive = Primitive;
