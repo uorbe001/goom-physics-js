@@ -379,71 +379,84 @@ define(["goom-math", "../../src/contact", "../../src/intersection_tests", "../..
 			expect(this.contacts.length).toBe(0);
 		});
 
-		xit("should detect a collision between two boxes", function() {
-		var b1, b2;
-		b1 = new Physics.Primitives.Box(this.b1, new Vector3D(1, 1, 1), this.off1);
-		b2 = new Physics.Primitives.Box(this.b1, new Vector3D(1, 1, 1), this.off2);
-		expect(this.cd.boxAndBox(b1, b2, this.data, this.contacts)).toBeTruthy();
-		return expect(this.contacts.length).toBeGreaterThan(0);
+		it("should detect a collision between two boxes", function() {
+			var off1 = new Mathematics.Matrix4D();
+			off1.makeTranslation(0, -0.9, 0);
+			var rot = new Mathematics.Matrix4D();
+			rot.makeRotation(Mathematics.Vector3D.Z_AXIS, Math.PI / 6);
+			off1.multiply(rot);
+			rot.makeRotation(Mathematics.Vector3D.UP, Math.PI / 6);
+			off1.multiply(rot);
+			var off2 = new Mathematics.Matrix4D();
+			off2.makeTranslation(0, 1, 0);
+
+			var b1 = new Primitives.Box(this.b1, new Mathematics.Vector3D(1, 1, 1), off1);
+			var b2 = new Primitives.Box(this.b2, new Mathematics.Vector3D(1, 1, 1), off2);
+			expect(this.cd.boxAndBox(b1, b2, this.data, this.contacts)).toBeTruthy();
+			expect(this.contacts.length).toBe(1);
+			expect(this.contacts[0].normal.x).toBe(0);
+			expect(this.contacts[0].normal.y).toBe(-1);
+			expect(this.contacts[0].normal.z).toBe(0);
+			expect(this.contacts[0].point.x).toBe(1);
+			expect(Math.round(this.contacts[0].point.y*10)/10).toBe(0);
+			expect(this.contacts[0].point.z).toBe(1);
+			expect(Math.round(this.contacts[0].penetration*10)/10).toBe(0.1);
+			expect(this.contacts[0].restitution).toBe(0.6);
+			expect(this.contacts[0].friction).toBe(0.4);
+			expect(this.contacts[0].bodies[0]).toBe(this.b1);
+			expect(this.contacts[0].bodies[1]).toBe(this.b2);
+			//TODO: The expectations are probably wrong and more cases need to be tested.
 		});
-		xit("should not detect a collision between two boxes when they are too far appart", function() {
-		var b1, b2;
-		b1 = new Physics.Primitives.Box(this.b1, new Vector3D(1, 1, 1), this.faroff1);
-		b2 = new Physics.Primitives.Box(this.b1, new Vector3D(1, 1, 1), this.faroff2);
-		expect(this.cd.boxAndBox(b1, b2, this.data, this.contacts)).toBeFalsy();
-		return expect(this.contacts.length).toBe(0);
+
+		it("should not detect a collision between two boxes when they are too far appart", function() {
+			var off1 = new Mathematics.Matrix4D();
+			off1.makeTranslation(0, -1, 0);
+			var off2 = new Mathematics.Matrix4D();
+			off2.makeTranslation(0, 1.1, 0);
+
+			var b1 = new Primitives.Box(this.b1, new Mathematics.Vector3D(1, 1, 1), off1);
+			var b2 = new Primitives.Box(this.b2, new Mathematics.Vector3D(1, 1, 1), off2);
+			expect(this.cd.boxAndBox(b1, b2, this.data, this.contacts)).toBeFalsy();
+			expect(this.contacts.length).toBe(0);
+			expect(this.cd.boxAndBox(b2, b1, this.data, this.contacts)).toBeFalsy();
+			expect(this.contacts.length).toBe(0);
+
+			off1.makeTranslation(0, 0, 0);
+			off2.makeTranslation(2.1, 0, 0);
+
+			b1 = new Primitives.Box(this.b1, new Mathematics.Vector3D(1, 1, 1), off1);
+			b2 = new Primitives.Box(this.b2, new Mathematics.Vector3D(1, 1, 1), off2);
+			expect(this.cd.boxAndBox(b1, b2, this.data, this.contacts)).toBeFalsy();
+			expect(this.contacts.length).toBe(0);
+			expect(this.cd.boxAndBox(b2, b1, this.data, this.contacts)).toBeFalsy();
+			expect(this.contacts.length).toBe(0);
 		});
-		xit("should be able to detect collision between two given bodies, with their primitives set up", function() {
-		this.b1 = new Physics.RigidBody(new Vector3D(1, 0, 0));
-		this.b1.addPrimitives({
-		type: 'box',
-		halfSize: {
-		x: 1,
-		y: 1,
-		z: 1
-		}
+
+		it("should be able to detect collision between two given bodies, with their primitives set up", function() {
+			this.b1 = new RigidBody(new Mathematics.Vector3D(1, 0, 0));
+			this.b1.addPrimitives({type: 'box', halfSize: {x: 1, y: 1, z: 1}});
+			this.b2 = new RigidBody(new Mathematics.Vector3D(-1, 0, 0));
+			this.b2.addPrimitives({type: 'box', halfSize: {x: 1, y: 1, z: 1}});
+			expect(this.cd.checkForContacts(this.b1, this.b2, this.data, this.contacts)).toBeTruthy();
+			expect(this.contacts.length).toBe(1);
+			expect(this.cd.checkForContacts(this.b2, this.b1, this.data, this.contacts)).toBeTruthy();
+			expect(this.contacts.length).toBe(2);
 		});
-		this.b2 = new Physics.RigidBody(new Vector3D(-1, -1, 0));
-		this.b2.addPrimitives({
-		type: 'box',
-		halfSize: {
-		x: 1,
-		y: 1,
-		z: 1
-		}
+
+		it("should be able to detect collisions between a body and a plane", function() {
+			this.b1 = new RigidBody(new Mathematics.Vector3D(1, 0, 0));
+			this.b1.addPrimitives({type: 'box', halfSize: {x: 1, y: 1, z: 1}});
+			var plane = new Primitives.Plane(null, new Mathematics.Vector3D(0, 1, 0), -1);
+			expect(this.cd.checkForContactsWithPlane(this.b1, plane, this.data, this.contacts)).toBeTruthy();
+			expect(this.contacts.length).toBe(4);
 		});
-		expect(this.cd.checkForContacts(this.b1, this.b2, this.data, this.contacts)).toBeTruthy();
-		return expect(this.contacts.length).toBe(1);
-		});
-		xit("should be able to detect collisions between a body and a plane", function() {
-		var plane;
-		this.b1 = new Physics.RigidBody(new Vector3D(1, 0, 0));
-		this.b1.addPrimitives({
-		type: 'box',
-		halfSize: {
-		x: 1,
-		y: 1,
-		z: 1
-		}
-		});
-		plane = new Physics.Primitives.Plane(null, new Math.Vector3D(0, 1, 0), -1);
-		expect(this.cd.checkForContactsWithPlane(this.b1, plane, this.data, this.contacts)).toBeTruthy();
-		return expect(this.contacts.length).toBe(4);
-		});
-		xit("should not detect collisions between a body and a plane", function() {
-		var plane;
-		this.b1 = new Physics.RigidBody(new Vector3D(100, 0, 0));
-		this.b1.addPrimitives({
-		type: 'box',
-		halfSize: {
-		x: 1,
-		y: 1,
-		z: 1
-		}
-		});
-		plane = new Physics.Primitives.Plane(null, new Math.Vector3D(0, 1, 0), -1.1);
-		expect(this.cd.checkForContactsWithPlane(this.b1, plane, this.data, this.contacts)).toBeFalsy();
-		return expect(this.contacts.length).toBe(0);
+
+		it("should not detect collisions between a body and a plane when they are too far appart", function() {
+			this.b1 = new RigidBody(new Mathematics.Vector3D(1, 0, 0));
+			this.b1.addPrimitives({type: 'box', halfSize: {x: 1, y: 1, z: 1}});
+			var plane = new Primitives.Plane(null, new Mathematics.Vector3D(0, 1, 0), -1.1);
+			expect(this.cd.checkForContactsWithPlane(this.b1, plane, this.data, this.contacts)).toBeFalsy();
+			expect(this.contacts.length).toBe(0);
 		});
 	});
 });

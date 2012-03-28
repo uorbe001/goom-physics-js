@@ -37,7 +37,7 @@ define(["goom-math", "./primitives", "./bounding_volume_hierarchy_node"], functi
 	var RigidBody = (function() {
 		function RigidBody(position, orientation, velocity, angular_velocity) {
 			this.position = position !== null && position !== undefined? position: new Mathematics.Vector3D();
-			this.orientation = orientation !== null && position !== undefined? orientation: new Mathematics.Quaternion();
+			this.orientation = orientation !== null && orientation !== undefined? orientation: new Mathematics.Quaternion();
 			this.velocity = velocity !== null && velocity !== undefined? velocity: new Mathematics.Vector3D();
 			this.angular_velocity = angular_velocity !== null && angular_velocity !== undefined? angular_velocity: new Mathematics.Vector3D();
 			this.inverseMass = 0;

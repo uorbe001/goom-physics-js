@@ -260,37 +260,37 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 			var test = false;
 
 			//Test the different axes for intersections keeping track of the smallest penetration
-			axis_test_data = this._testAxis(box_one, box_two, box_one.axisVector(0, this.__helperVector3), to_centre, 0, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_one.axisVector(0, this.__helperVector3), to_centre, 0, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
 			axis_test_data = this.__testAxis(box_one, box_two, box_one.axisVector(1, this.__helperVector3), to_centre, 1, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_one.axisVector(2, this.__helperVector3), to_centre, 2, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_one.axisVector(2, this.__helperVector3), to_centre, 2, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3), to_centre, 3, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3), to_centre, 3, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3), to_centre, 4, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3), to_centre, 4, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3), to_centre, 5, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3), to_centre, 5, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
 			//Store the best axis-major
 			var best_single_axis = best;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 6, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 6, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 7, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 7, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 8, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 8, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 9, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 9, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 10, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 10, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 11, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 11, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 12, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 12, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 13, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 13, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
-			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 14, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			axis_test_data = this.__testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 14, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
 			if (!test) return false;
 
 			var contact;
