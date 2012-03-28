@@ -44,7 +44,7 @@ define(["goom-math", "./bounding_sphere", "./rigid_body"], function(Mathematics,
 
 		/**
 			Checks whether a node is overlapping another.
-			@params {Physics.BoundingVolumeHierarchyNode} The other BoundingVolumeHierarchyNode to 
+			@params {Physics.BoundingVolumeHierarchyNode} The other BoundingVolumeHierarchyNode to
 			check against.
 			@returns {Boolean} true if node is overlapping the other node, false otherwise.
 		*/

@@ -235,11 +235,12 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 			return this.__axisTestData;
 		};
 
-		axis_index_to_name = function() {
+		var x = 'x', y = 'y', z = 'z';
+		var axis_index_to_name = function() {
 			switch(index) {
-				case 0: return 'x';
-				case 1: return 'y';
-				case 2: return 'z';
+				case 0: return x;
+				case 1: return y;
+				case 2: return z;
 			}
 		};
 
@@ -307,7 +308,7 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 				if (box_two.axisVector(0, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.x = -contact.point.x;
 				if (box_two.axisVector(1, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.y = -contact.point.y;
 				if (box_two.axisVector(2, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.z = -contact.point.z;
-			
+				
 				box_two.transformationMatrix.transformVector(contact.point);
 				contact.penetration = penetration;
 				contact.setContactData(box_one.body, box_two.body, data.restitution, data.friction);
