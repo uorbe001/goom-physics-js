@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigid_body"], function(Mathematics, Contact, IntersectionTests) {
+define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigid_body"], function(Mathematics, Contact, IntersectionTests, Primitives) {
 	/**
 		Creates a new CollisionDetector.
 		@class Collision detectors are used to check collisions between primitive and fetch the contact data.
@@ -26,6 +26,12 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 			//Helper data used to avoid instantiating objects at runtime.
 			this.__helperVector = new Mathematics.Vector3D();
 			this.__helperVector2 = new Mathematics.Vector3D();
+			this.__helperVector3 = new Mathematics.Vector3D();
+			this.__helperVector4 = new Mathematics.Vector3D();
+			this.__helperVector5 = new Mathematics.Vector3D();
+			this.__helperVector6 = new Mathematics.Vector3D();
+			this.__helperVector7 = new Mathematics.Vector3D();
+
 			this.__helperMatrix = new Mathematics.Matrix3D();
 			this.__axisTestData = new Array(3);
 		}
@@ -197,7 +203,7 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 			it updates these values.
 			@inner
 		*/
-		CollisionDetector.prototype._testAxis = function(box_one, box_two, axis, to_centre, index, smallest_penetration, smallest_case) {
+		CollisionDetector.prototype.__testAxis = function(box_one, box_two, axis, to_centre, index, smallest_penetration, smallest_case) {
 			//Don't check almost parallel axes
 			if (axis.squaredMagnitude() < 0.0001) {
 				this.__axisTestData[0] = true, this.__axisTestData[1] = smallest_penetration, this.__axisTestData[2] = smallest_case;
@@ -229,279 +235,279 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 			return this.__axisTestData;
 		};
 
+		axis_index_to_name = function() {
+			switch(index) {
+				case 0: return 'x';
+				case 1: return 'y';
+				case 2: return 'z';
+			}
+		};
+
 		/**
-		Checks for contacts between two boxes.
-		@param {Physics.Box} box_one The first box to check.
-		@param {Physics.Box} box_two The second box to check.
-		@param data Data affecting the contact resolution.
-		@param {Array} contacts The array where contact data will be stored.
-		@returns {Boolean} true if contacts where found, false otherwise.
+			Checks for contacts between two boxes.
+			@param {Physics.Box} box_one The first box to check.
+			@param {Physics.Box} box_two The second box to check.
+			@param data Data affecting the contact resolution.
+			@param {Array} contacts The array where contact data will be stored.
+			@returns {Boolean} true if contacts where found, false otherwise.
 		*/
 		CollisionDetector.prototype.boxAndBox = function(box_one, box_two, data, contacts) {
-		var axis, axis_name, best, best_single_axis, box_one_axis, box_one_axis_index, box_one_axis_name, box_two_axis, box_two_axis_index, box_two_axis_name, contact, denominator, dp_one_two, dp_st_one, dp_st_two, i, mua, mub, normal, penetration, point_on_box_one_edge, point_on_box_two_edge, sm_one, sm_two, test, to_centre, to_st, use_one, vertex, _ref, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
-		to_centre = box_two.position().substract(box_one.position());
-		penetration = best = Number.MAX_VALUE;
-		test = false;
-		_ref = this._testAxis(box_one, box_two, box_one.axisVector(0), to_centre, 0, penetration, best), test = _ref[0], penetration = _ref[1], best = _ref[2];
-		if (!test) {
-		return false;
-		}
-		_ref2 = this._testAxis(box_one, box_two, box_one.axisVector(1), to_centre, 1, penetration, best), test = _ref2[0], penetration = _ref2[1], best = _ref2[2];
-		if (!test) {
-		return false;
-		}
-		_ref3 = this._testAxis(box_one, box_two, box_one.axisVector(2), to_centre, 2, penetration, best), test = _ref3[0], penetration = _ref3[1], best = _ref3[2];
-		if (!test) {
-		return false;
-		}
-		_ref4 = this._testAxis(box_one, box_two, box_two.axisVector(0), to_centre, 3, penetration, best), test = _ref4[0], penetration = _ref4[1], best = _ref4[2];
-		if (!test) {
-		return false;
-		}
-		_ref5 = this._testAxis(box_one, box_two, box_two.axisVector(1), to_centre, 4, penetration, best), test = _ref5[0], penetration = _ref5[1], best = _ref5[2];
-		if (!test) {
-		return false;
-		}
-		_ref6 = this._testAxis(box_one, box_two, box_two.axisVector(2), to_centre, 5, penetration, best), test = _ref6[0], penetration = _ref6[1], best = _ref6[2];
-		if (!test) {
-		return false;
-		}
-		best_single_axis = best;
-		_ref7 = this._testAxis(box_one, box_two, box_two.axisVector(0).crossProduct(box_one.axisVector(0)), to_centre, 6, penetration, best), test = _ref7[0], penetration = _ref7[1], best = _ref7[2];
-		if (!test) {
-		return false;
-		}
-		_ref8 = this._testAxis(box_one, box_two, box_two.axisVector(1).crossProduct(box_one.axisVector(0)), to_centre, 7, penetration, best), test = _ref8[0], penetration = _ref8[1], best = _ref8[2];
-		if (!test) {
-		return false;
-		}
-		_ref9 = this._testAxis(box_one, box_two, box_two.axisVector(2).crossProduct(box_one.axisVector(0)), to_centre, 8, penetration, best), test = _ref9[0], penetration = _ref9[1], best = _ref9[2];
-		if (!test) {
-		return false;
-		}
-		_ref10 = this._testAxis(box_one, box_two, box_two.axisVector(0).crossProduct(box_one.axisVector(1)), to_centre, 9, penetration, best), test = _ref10[0], penetration = _ref10[1], best = _ref10[2];
-		if (!test) {
-		return false;
-		}
-		_ref11 = this._testAxis(box_one, box_two, box_two.axisVector(1).crossProduct(box_one.axisVector(1)), to_centre, 10, penetration, best), test = _ref11[0], penetration = _ref11[1], best = _ref11[2];
-		if (!test) {
-		return false;
-		}
-		_ref12 = this._testAxis(box_one, box_two, box_two.axisVector(2).crossProduct(box_one.axisVector(1)), to_centre, 11, penetration, best), test = _ref12[0], penetration = _ref12[1], best = _ref12[2];
-		if (!test) {
-		return false;
-		}
-		_ref13 = this._testAxis(box_one, box_two, box_two.axisVector(0).crossProduct(box_one.axisVector(2)), to_centre, 12, penetration, best), test = _ref13[0], penetration = _ref13[1], best = _ref13[2];
-		if (!test) {
-		return false;
-		}
-		_ref14 = this._testAxis(box_one, box_two, box_two.axisVector(1).crossProduct(box_one.axisVector(2)), to_centre, 13, penetration, best), test = _ref14[0], penetration = _ref14[1], best = _ref14[2];
-		if (!test) {
-		return false;
-		}
-		_ref15 = this._testAxis(box_one, box_two, box_two.axisVector(2).crossProduct(box_one.axisVector(2)), to_centre, 14, penetration, best), test = _ref15[0], penetration = _ref15[1], best = _ref15[2];
-		if (!test) {
-		return false;
-		}
-		if (best < 3) {
-		normal = box_one.axisVector(best);
-		if (normal.dotProduct(to_centre) > 0) {
-		normal.scale(-1);
-		}
-		vertex = box_two.halfSize.clone();
-		if (box_two.axisVector(0).dotProduct(normal) < 0) {
-		vertex.x = -vertex.x;
-		}
-		if (box_two.axisVector(1).dotProduct(normal) < 0) {
-		vertex.y = -vertex.y;
-		}
-		if (box_two.axisVector(2).dotProduct(normal) < 0) {
-		vertex.z = -vertex.z;
-		}
-		contact = new Physics.Contact(vertex.transformByMatrix(box_two.transformationMatrix), normal, penetration);
-		contact.setContactData(box_one.body, box_two.body, data.restitution, data.friction);
-		contacts.push(contact);
-		return true;
-		} else if (best < 6) {
-		best -= 3;
-		to_centre.scale(-1);
-		normal = box_two.axisVector(best);
-		if (normal.dotProduct(to_centre) > 0) {
-		normal.scale(-1);
-		}
-		vertex = box_one.halfSize.clone();
-		if (box_one.axisVector(0).dotProduct(normal) < 0) {
-		vertex.x = -vertex.x;
-		}
-		if (box_one.axisVector(1).dotProduct(normal) < 0) {
-		vertex.y = -vertex.y;
-		}
-		if (box_one.axisVector(2).dotProduct(normal) < 0) {
-		vertex.z = -vertex.z;
-		}
-		contact = new Physics.Contact(vertex.transformByMatrix(box_one.transformationMatrix), normal, penetration);
-		contact.setContactData(box_two.body, box_one.body, data.restitution, data.friction);
-		contacts.push(contact);
-		return true;
-		} else {
-		best -= 6;
-		box_two_axis_index = best % 3;
-		box_one_axis_index = (best - box_two_axis_index) / 3;
-		box_one_axis = box_one.axisVector(box_one_axis_index);
-		box_two_axis = box_two.axisVector(box_two_axis_index);
-		axis = box_two_axis.crossProduct(box_one_axis, new Math.Vector3D()).normalize();
-		if (axis.dotProduct(to_centre) > 0) {
-		axis.scale(-1);
-		}
-		point_on_box_one_edge = box_one.halfSize.clone();
-		point_on_box_two_edge = box_two.halfSize.clone();
-		for (i = 0; i <= 3; i++) {
-		axis_name = (function() {
-		switch (i) {
-		case 0:
-		return 'x';
-		case 1:
-		return 'y';
-		case 2:
-		return 'z';
-		}
-		})();
-		if (i === box_one_axis_index) {
-		point_on_box_one_edge[axis_name] = 0;
-		} else if (box_one.axisVector(i).dotProduct(axis) > 0) {
-		point_on_box_one_edge[axis_name] = -point_on_box_one_edge[axis_name];
-		}
-		if (i === box_two_axis_index) {
-		point_on_box_two_edge[axis_name] = 0;
-		} else if (box_two.axisVector(i).dotProduct(axis) < 0) {
-		point_on_box_two_edge[axis_name] = -point_on_box_two_edge[axis_name];
-		}
-		}
-		point_on_box_one_edge.transformByMatrix(box_one.transformationMatrix);
-		point_on_box_two_edge.transformByMatrix(box_two.transformationMatrix);
-		use_one = best_single_axis > 2;
-		sm_one = box_one_axis.squaredMagnitude();
-		sm_two = box_two_axis.squaredMagnitude();
-		dp_one_two = box_two_axis.dotProduct(box_one_axis);
-		to_st = point_on_box_one_edge.substract(point_on_box_two_edge, new Math.Vector3D());
-		dp_st_one = box_one_axis.dotProduct(to_st);
-		dp_st_two = box_two_axis.dotProduct(to_st);
-		denominator = sm_one * sm_two - dp_one_two * dp_one_two;
-		if (Math.abs(denominator) < 0.0001) {
-		vertex = use_one ? point_on_box_one_edge : point_on_box_two_edge;
-		} else {
-		mua = (dp_one_two * dp_st_two - sm_two * dp_st_one) / denominator;
-		mub = (sm_one * dp_st_two - dp_one_two * dp_st_one) / denominator;
-		box_one_axis_name = (function() {
-		switch (box_one_axis_index) {
-		case 0:
-		return 'x';
-		case 1:
-		return 'y';
-		case 2:
-		return 'z';
-		}
-		})();
-		box_two_axis_name = (function() {
-		switch (box_two_axis_index) {
-		case 0:
-		return 'x';
-		case 1:
-		return 'y';
-		case 2:
-		return 'z';
-		}
-		})();
-		if (mua > box_one.halfSize[box_one_axis_name] || mua < -box_one.halfSize[box_one_axis_name] || mub > box_two.halfSize[box_two_axis_name] || mub < -box_two.halfSize[box_two_axis_name]) {
-		vertex = use_one ? point_on_box_one_edge : point_on_box_two_edge;
-		} else {
-		point_on_box_one_edge.add(box_one_axis.scale(mua));
-		point_on_box_two_edge.add(box_two_axis.scale(mub));
-		vertex = point_on_box_one_edge.scale(0.5).add(point_on_box_two_edge.scale(0.5));
-		}
-		}
-		contact = new Physics.Contact(vertex, axis, penetration);
-		contact.setContactData(box_one.body, box_two.body, data.restitution, data.friction);
-		contacts.push(contact);
-		return true;
-		}
-		return false;
+			//Get the vector from the position of the first box to the position of the second box
+			var to_centre = box_two.position(this.__helperVector2).substract(box_one.position(this.__helperVector));
+			//Assume there is no contact
+			var penetration, best, axis_test_data;
+			penetration = best = Number.MAX_VALUE;
+			var test = false;
+
+			//Test the different axes for intersections keeping track of the smallest penetration
+			axis_test_data = this._testAxis(box_one, box_two, box_one.axisVector(0, this.__helperVector3), to_centre, 0, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this.__testAxis(box_one, box_two, box_one.axisVector(1, this.__helperVector3), to_centre, 1, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_one.axisVector(2, this.__helperVector3), to_centre, 2, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3), to_centre, 3, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3), to_centre, 4, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3), to_centre, 5, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			//Store the best axis-major
+			var best_single_axis = best;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 6, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 7, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(0, this.__helperVector)), to_centre, 8, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 9, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 10, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(1, this.__helperVector)), to_centre, 11, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(0, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 12, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(1, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 13, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+			axis_test_data = this._testAxis(box_one, box_two, box_two.axisVector(2, this.__helperVector3).crossProduct(box_one.axisVector(2, this.__helperVector)), to_centre, 14, penetration, best), test = axis_test_data[0], penetration = axis_test_data[1], best = axis_test_data[2];
+			if (!test) return false;
+
+			var contact;
+			if (best < 3) {
+				//We've got a vertex of box two on a face of box_one
+				//Create contact data
+				contact = this.__getFreeContact();
+				box_one.axisVector(best, contact.normal);
+				if (contact.normal.dotProduct(to_centre) > 0) {
+					contact.normal.scale(-1);
+				}
+
+				box_two.halfSize.clone(contact.point);
+				if (box_two.axisVector(0, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.x = -contact.point.x;
+				if (box_two.axisVector(1, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.y = -contact.point.y;
+				if (box_two.axisVector(2, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.z = -contact.point.z;
+			
+				box_two.transformationMatrix.transformVector(contact.point);
+				contact.penetration = penetration;
+				contact.setContactData(box_one.body, box_two.body, data.restitution, data.friction);
+				contacts.push(contact);
+				return true;
+			} else if (best < 6) {
+				//We've got a vertex of box one on a face of two
+				best -= 3;
+				to_centre.scale(-1);
+				//Create contact data
+				contact = this.__getFreeContact();
+				box_two.axisVector(best, contact.normal);
+				if (contact.normal.dotProduct(to_centre) > 0) {
+					contact.normal.scale(-1);
+				}
+
+				box_one.halfSize.clone(contact.point);
+				if (box_one.axisVector(0, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.x = -contact.point.x;
+				if (box_one.axisVector(1, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.y = -contact.point.y;
+				if (box_one.axisVector(2, this.__helperVector3).dotProduct(contact.normal) < 0) contact.point.z = -contact.point.z;
+				
+				box_one.transformationMatrix.transformVector(contact.point);
+				contact.penetration = penetration;
+				contact.setContactData(box_two.body, box_one.body, data.restitution, data.friction);
+				contacts.push(contact);
+				return true;
+			} else {
+				//Edge-to-edge contact
+				best -= 6;
+				var box_two_axis_index = best % 3;
+				var box_one_axis_index = (best - box_two_axis_index) / 3;
+				var box_one_axis = box_one.axisVector(box_one_axis_index, this.__helperVector);
+				var box_two_axis = box_two.axisVector(box_two_axis_index, this.__helperVector3);
+				var axis = box_two_axis.crossProduct(box_one_axis, this.__helperVector4).normalize();
+				//This axis should point from box one to box two
+				if (axis.dotProduct(to_centre) > 0) axis.scale(-1);
+				//Get the edges
+				var point_on_box_one_edge = box_one.halfSize.clone(this.__helperVector5);
+				var point_on_box_two_edge = box_two.halfSize.clone(this.__helperVector6);
+		
+				if (0 === box_one_axis_index) {
+					point_on_box_one_edge.x = 0;
+				} else if (box_one.axisVector(0, this.__helperVector7).dotProduct(axis) > 0) {
+					point_on_box_one_edge.x = -point_on_box_one_edge.x;
+				}
+				if (0 === box_two_axis_index) {
+					point_on_box_two_edge.x = 0;
+				} else if (box_two.axisVector(0, this.__helperVector7).dotProduct(axis) < 0) {
+					point_on_box_two_edge.x = -point_on_box_two_edge.x;
+				}
+
+				if (1 === box_one_axis_index) {
+					point_on_box_one_edge.y = 0;
+				} else if (box_one.axisVector(1, this.__helperVector7).dotProduct(axis) > 0) {
+					point_on_box_one_edge.y = -point_on_box_one_edge.y;
+				}
+				if (1 === box_two_axis_index) {
+					point_on_box_two_edge.y = 0;
+				} else if (box_two.axisVector(1, this.__helperVector7).dotProduct(axis) < 0) {
+					point_on_box_two_edge.y = -point_on_box_two_edge.y;
+				}
+
+				if (2 === box_one_axis_index) {
+					point_on_box_one_edge.z = 0;
+				} else if (box_one.axisVector(2, this.__helperVector7).dotProduct(axis) > 0) {
+					point_on_box_one_edge.z = -point_on_box_one_edge.z;
+				}
+				if (2 === box_two_axis_index) {
+					point_on_box_two_edge.z = 0;
+				} else if (box_two.axisVector(2, this.__helperVector7).dotProduct(axis) < 0) {
+					point_on_box_two_edge.z = -point_on_box_two_edge.z;
+				}
+		
+				//Move the edges into world coordinates
+				box_one.transformationMatrix.transformVector(point_on_box_one_edge);
+				box_two.transformationMatrix.transformVector(point_on_box_two_edge);
+				//Find out the point of closest approach of the two segments
+				var use_one = best_single_axis > 2;
+				var sm_one = box_one_axis.squaredMagnitude();
+				var sm_two = box_two_axis.squaredMagnitude();
+				var dp_one_two = box_two_axis.dotProduct(box_one_axis);
+				var to_st = point_on_box_one_edge.substract(point_on_box_two_edge, this.__helperVector7);
+				var dp_st_one = box_one_axis.dotProduct(to_st);
+				var dp_st_two = box_two_axis.dotProduct(to_st);
+				var denominator = sm_one * sm_two - dp_one_two * dp_one_two;
+				var vertex;
+				//Zero denominator indicates parallel lines
+				if (Math.abs(denominator) < 0.0001) {
+					vertex = use_one ? point_on_box_one_edge : point_on_box_two_edge;
+				} else {
+					var mua = (dp_one_two * dp_st_two - sm_two * dp_st_one) / denominator;
+					var mub = (sm_one * dp_st_two - dp_one_two * dp_st_one) / denominator;
+
+					//If either of the edges has the nearest point out of bounds, then the edges aren't crossed, we have an edge-face contact.
+					var box_one_axis_name = axis_index_to_name(box_one_axis_index);
+					var box_two_axis_name = axis_index_to_name(box_two_axis_index);
+
+					if (mua > box_one.halfSize[box_one_axis_name] || mua < -box_one.halfSize[box_one_axis_name] || mub > box_two.halfSize[box_two_axis_name] || mub < -box_two.halfSize[box_two_axis_name]) {
+						vertex = use_one ? point_on_box_one_edge : point_on_box_two_edge;
+					} else {
+						point_on_box_one_edge.add(box_one_axis.scale(mua));
+						point_on_box_two_edge.add(box_two_axis.scale(mub));
+						vertex = point_on_box_one_edge.scale(0.5).add(point_on_box_two_edge.scale(0.5));
+					}
+				}
+
+				//Create contact data
+				contact = this.__getFreeContact();
+				vertex.clone(contact.point);
+				axis.clone(contact.normal);
+				contact.penetration = penetration;
+				contact.setContactData(box_one.body, box_two.body, data.restitution, data.friction);
+				contacts.push(contact);
+				return true;
+			}
+			
+			return false;
 		};
+
 		/**
-		Checks for contacts between the two given bodies. This will check for contacts between all the primitives
-		in the given bodies.
-		@param {Physics.RigidBody} first_body The first body to check.
-		@param {Physics.RigidBody} second_body The second body to check.
-		@param data Data affecting the contact resolution.
-		@param {Array} contacts The array where contact data will be stored.
-		@returns {Boolean} true if contacts where found, false otherwise.
+			Checks for contacts between the two given bodies. This will check for contacts between all the primitives
+			in the given bodies.
+			@param {Physics.RigidBody} first_body The first body to check.
+			@param {Physics.RigidBody} second_body The second body to check.
+			@param data Data affecting the contact resolution.
+			@param {Array} contacts The array where contact data will be stored.
+			@returns {Boolean} true if contacts where found, false otherwise.
 		*/
 		CollisionDetector.prototype.checkForContacts = function(first_body, second_body, data, contacts) {
-		var primitive_one, primitive_two, result, _i, _j, _len, _len2, _ref, _ref2;
-		result = false;
-		_ref = first_body.primitives;
-		for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-		primitive_one = _ref[_i];
-		_ref2 = second_body.primitives;
-		for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-		primitive_two = _ref2[_j];
-		if (primitive_one instanceof Physics.Primitives.Plane) {
-		if (primitive_two instanceof Physics.Primitives.Box) {
-		result = result || this.boxAndHalfSpace(primitive_two, primitive_one, data, contacts);
-		} else if (primitive_two instanceof Physics.Primitives.Sphere) {
-		result = result || this.sphereAndHalfSpace(primitive_two, primitive_one, data, contacts);
-		}
-		continue;
-		}
-		if (primitive_one instanceof Physics.Primitives.Box) {
-		if (primitive_two instanceof Physics.Primitives.Plane) {
-		result = result || this.boxAndHalfSpace(primitive_one, primitive_two, data, contacts);
-		} else if (primitive_two instanceof Physics.Primitives.Sphere) {
-		result = result || this.boxAndSphere(primitive_one, primitive_two, data, contacts);
-		} else if (primitive_two instanceof Physics.Primitives.Box) {
-		result = result || this.boxAndBox(primitive_one, primitive_two, data, contacts);
-		}
-		continue;
-		}
-		if (primitive_one instanceof Physics.Primitives.Sphere) {
-		if (primitive_two instanceof Physics.Primitives.Plane) {
-		result = result || this.sphereAndHalfSpace(primitive_one, primitive_two, data, contacts);
-		} else if (primitive_two instanceof Physics.Primitives.Box) {
-		result = result || this.boxAndSphere(primitive_two, primitive_one, data, contacts);
-		} else if (primitive_two instanceof Physics.Primitives.Sphere) {
-		result = result || this.sphereAndSphere(primitive_one, primitive_two, data, contacts);
-		}
-		continue;
-		}
-		}
-		}
-		return result;
+			var primitive_one, primitive_two, i, j, len, len2, ref2;
+			var result = false;
+			var ref = first_body.primitives;
+
+			for (i = 0, len = ref.length; i < len; i++) {
+				primitive_one = ref[i];
+				ref2 = second_body.primitives;
+				for (j = 0, len2 = ref2.length; j < len2; j++) {
+					//Check each primitive in the first body with the primitives in the second body
+					primitive_two = ref2[j];
+					if (primitive_one instanceof Primitives.Plane) {
+						if (primitive_two instanceof Primitives.Box) {
+							result = result || this.boxAndHalfSpace(primitive_two, primitive_one, data, contacts);
+						} else if (primitive_two instanceof Primitives.Sphere) {
+							result = result || this.sphereAndHalfSpace(primitive_two, primitive_one, data, contacts);
+						}
+						continue;
+					}
+						
+					if (primitive_one instanceof Primitives.Box) {
+						if (primitive_two instanceof Primitives.Plane) {
+							result = result || this.boxAndHalfSpace(primitive_one, primitive_two, data, contacts);
+						} else if (primitive_two instanceof Primitives.Sphere) {
+							result = result || this.boxAndSphere(primitive_one, primitive_two, data, contacts);
+						} else if (primitive_two instanceof Primitives.Box) {
+							result = result || this.boxAndBox(primitive_one, primitive_two, data, contacts);
+						}
+						continue;
+					}
+
+					if (primitive_one instanceof Primitives.Sphere) {
+						if (primitive_two instanceof Primitives.Plane) {
+							result = result || this.sphereAndHalfSpace(primitive_one, primitive_two, data, contacts);
+						} else if (primitive_two instanceof Primitives.Box) {
+							result = result || this.boxAndSphere(primitive_two, primitive_one, data, contacts);
+						} else if (primitive_two instanceof Primitives.Sphere) {
+							result = result || this.sphereAndSphere(primitive_one, primitive_two, data, contacts);
+						}
+						continue;
+					}
+				}
+			}
+			return result;
 		};
+
 		/**
-		Checks for contacts between a body and a plane. This will check for contacts between all the primitives
-		in the given body.
-		@param {Physics.RigidBody} body The body to check.
-		@param {Physics.Primitives.Plane} plane The plane to check.
-		@param data Data affecting the contact resolution.
-		@param {Array} contacts The array where contact data will be stored.
-		@returns {Boolean} true if contacts where found, false otherwise.
+			Checks for contacts between a body and a plane. This will check for contacts between all the primitives
+			in the given body.
+			@param {Physics.RigidBody} body The body to check.
+			@param {Physics.Primitives.Plane} plane The plane to check.
+			@param data Data affecting the contact resolution.
+			@param {Array} contacts The array where contact data will be stored.
+			@returns {Boolean} true if contacts where found, false otherwise.
 		*/
 		CollisionDetector.prototype.checkForContactsWithPlane = function(body, plane, data, contacts) {
-		var primitive_one, result, _i, _len, _ref;
-		result = false;
-		_ref = body.primitives;
-		for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-		primitive_one = _ref[_i];
-		if (primitive_one instanceof Physics.Primitives.Box) {
-		result = result || this.boxAndHalfSpace(primitive_one, plane, data, contacts);
-		continue;
-		}
-		if (primitive_one instanceof Physics.Primitives.Sphere) {
-		result = result || this.sphereAndHalfSpace(primitive_one, primitive_two, data, contacts);
-		continue;
-		}
-		}
-		return result;
+			var primitive_one, result, i, len, ref;
+			result = false;
+			ref = body.primitives;
+
+			for (i = 0, len = ref.length; i < len; i++) {
+				primitive_one = ref[i];
+				if (primitive_one instanceof Primitives.Box) {
+					result = result || this.boxAndHalfSpace(primitive_one, plane, data, contacts);
+					continue;
+				}
+				if (primitive_one instanceof Primitives.Sphere) {
+					result = result || this.sphereAndHalfSpace(primitive_one, primitive_two, data, contacts);
+					continue;
+				}
+			}
+			return result;
 		};
 		return CollisionDetector;
 	})();
