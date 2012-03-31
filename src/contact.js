@@ -36,6 +36,11 @@ define(["goom-math", "./rigid_body"], function(Mathematics) {
 			this.__contactTangent = new Array(2);
 			this.__contactTangent[0] = new Mathematics.Vector3D();
 			this.__contactTangent[1] = new Mathematics.Vector3D();
+			this.__angularInertia = new Array(2);
+			this.__angularInertia[0] = 0, this.__angularInertia[1] = 0;
+			this.__linearInertia = new Array(2);
+			this.__linearInertia[0] = 0, this.__linearInertia[1] = 0;
+			this.__impulse = new Mathematics.Vector3D();
 			this.toWorld = new Mathematics.Matrix3D();
 		}
 
@@ -145,7 +150,7 @@ define(["goom-math", "./rigid_body"], function(Mathematics) {
 			}
 
 			//Calculate relative velocity of the bodies at contact point
-			this.relativeContactPositions[0].crossProduct(this.bodies[0].angular_velocity, this.velocity);
+			this.bodies[0].angular_velocity.crossProduct(this.relativeContactPositions[0], this.velocity);
 			this.velocity.add(this.bodies[0].velocity);
 			//Calculate the ammount of velocity due to forces without reactions
 			var acceleration_velocity = this.bodies[0].lastFrameAcceleration.scale(duration, this.__helperVector);
@@ -155,7 +160,7 @@ define(["goom-math", "./rigid_body"], function(Mathematics) {
 
 			if (this.bodies[1] !== null && this.bodies[1] !== undefined) {
 				//Do the same for the second body
-				var second_velocity = this.relativeContactPositions[1].crossProduct(this.bodies[1].angular_velocity, this.__helperVector);
+				var second_velocity = this.bodies[1].angular_velocity.crossProduct(this.relativeContactPositions[1], this.__helperVector);
 				second_velocity.add(this.bodies[1].velocity);
 				//Add the velocity due to the second body to the total contact velocity
 				this.velocity.substract(second_velocity);
@@ -179,120 +184,151 @@ define(["goom-math", "./rigid_body"], function(Mathematics) {
 			@param {Array} angular_change Array holding vectors representing the angular position change for each body.
 			@param {Number} penetration Ammount of penetration to resolve.
 		*/
-		/*Contact.prototype.resolvePosition = function(linear_change, angular_change, penetration) {
-		var angular_inertia, angular_inertia_world, angular_move, linear_inertia, linear_move, max_magnitude, projection, target_angular_direction, total_inertia, total_move;
-		total_inertia = 0;
-		angular_inertia = [];
-		linear_inertia = [];
-		angular_inertia_world = this.normal.crossProduct(this.relativeContactPositions[0], new Math.Vector3D());
-		angular_inertia_world.transformByMatrix(this.bodies[0].inverseInertialTensorWorld);
-		this.relativeContactPositions[0].crossProduct(angular_inertia_world, angular_inertia_world);
-		angular_inertia.push(angular_inertia_world.dotProduct(this.normal));
-		linear_inertia.push(this.bodies[0].inverseMass);
-		total_inertia += angular_inertia[0] + linear_inertia[0];
-		if (this.bodies[1] != null) {
-		angular_inertia_world = this.normal.crossProduct(this.relativeContactPositions[1], new Math.Vector3D());
-		angular_inertia_world.transformByMatrix(this.bodies[1].inverseInertialTensorWorld);
-		this.relativeContactPositions[1].crossProduct(angular_inertia_world, angular_inertia_world);
-		angular_inertia.push(angular_inertia_world.dotProduct(this.normal));
-		linear_inertia.push(this.bodies[1].inverseMass);
-		total_inertia += angular_inertia[1] + linear_inertia[1];
-		}
-		angular_move = [];
-		linear_move = [];
-		angular_move.push(penetration * (angular_inertia[0] / total_inertia));
-		linear_move.push(penetration * (linear_inertia[0] / total_inertia));
-		projection = (this.normal.scale(-this.relativeContactPositions[0].dotProduct(this.normal), new Math.Vector3D())).add(this.relativeContactPositions[0]);
-		max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
-		if (angular_move[0] < -max_magnitude) {
-		total_move = angular_move[0] + linear_move[0];
-		angular_move[0] = -max_magnitude;
-		linear_move[0] = total_move - angular_move[0];
-		} else if (angular_move[0] > max_magnitude) {
-		total_move = angular_move[0] + linear_move[0];
-		angular_move[0] = max_magnitude;
-		linear_move[0] = total_move - angular_move[0];
-		}
-		if (angular_move[0] === 0) {
-		angular_change[0].zero();
-		} else {
-		target_angular_direction = this.normal.crossProduct(this.relativeContactPositions[0], new Math.Vector3D());
-		angular_change[0] = target_angular_direction.transformByMatrix(this.bodies[0].inverseInertialTensorWorld).scale(angular_move[0] / angular_inertia[0]);
-		}
-		linear_change[0] = this.normal.scale(linear_move[0], new Math.Vector3D());
-		this.bodies[0].position.add(linear_change[0]);
-		this.bodies[0].orientation.addVector(angular_change[0]);
-		if (!this.bodies[0].isAwake) {
-		this.bodies[0].calculateInternalData();
-		}
-		if (this.bodies[1] != null) {
-		angular_move.push(-penetration * (angular_inertia[1] / total_inertia));
-		linear_move.push(-penetration * (linear_inertia[1] / total_inertia));
-		projection = (this.normal.scale(-this.relativeContactPositions[1].dotProduct(this.normal), new Math.Vector3D())).add(this.relativeContactPositions[1]);
-		max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
-		if (angular_move[1] < -max_magnitude) {
-		total_move = angular_move[1] + linear_move[1];
-		angular_move[1] = -max_magnitude;
-		linear_move[1] = total_move - angular_move[1];
-		} else if (angular_move[1] > max_magnitude) {
-		total_move = angular_move[1] + linear_move[1];
-		angular_move[1] = max_magnitude;
-		linear_move[1] = total_move - angular_move[1];
-		}
-		if (angular_move[1] === 0) {
-		angular_change[1].zero();
-		} else {
-		target_angular_direction = this.normal.crossProduct(this.relativeContactPositions[1], new Math.Vector3D());
-		angular_change[1] = target_angular_direction.transformByMatrix(this.bodies[1].inverseInertialTensorWorld).scale(angular_move[1] / angular_inertia[1]);
-		}
-		linear_change[1] = this.normal.scale(linear_move[1], new Math.Vector3D());
-		this.bodies[1].position.add(linear_change[1]);
-		this.bodies[1].orientation.addVector(angular_change[1]);
-		if (!this.bodies[1].isAwake) {
-		this.bodies[1].calculateInternalData();
-		}
-		}
-		};*/
+		Contact.prototype.resolvePosition = function(linear_change, angular_change, penetration) {
+			var total_inertia = 0, total_move = 0;
+			//Calculate intertia of the first body
+			var angular_inertia_world = this.relativeContactPositions[0].crossProduct(this.normal, this.__helperVector);
+			this.bodies[0].inverseInertiaTensorWorld.transformVector(angular_inertia_world);
+			angular_inertia_world.crossProduct(this.relativeContactPositions[0]);
+			this.__angularInertia[0] = angular_inertia_world.dotProduct(this.normal);
+			//Linear inertia is the inverse mass
+			this.__linearInertia[0] = this.bodies[0].inverseMass;
+			//Keep track of total inertia from all components
+			total_inertia += this.__angularInertia[0] + this.__linearInertia[0];
+
+			if (this.bodies[1] !== null && this.bodies[1] !== undefined) {
+				//Calculate the second body's intertia
+				angular_inertia_world = this.relativeContactPositions[1].crossProduct(this.normal, this.__helperVector);
+				this.bodies[1].inverseInertiaTensorWorld.transformVector(angular_inertia_world);
+				angular_inertia_world.crossProduct(this.relativeContactPositions[1]);
+				this.__angularInertia[1] = angular_inertia_world.dotProduct(this.normal);
+				//Linear inertia is the inverse mass
+				this.__linearInertia[1] = this.bodies[1].inverseMass;
+				//Keep track of total inertia from all components
+				total_inertia += this.__angularInertia[1] + this.__linearInertia[1];
+			}
+
+			//Calculate angular and linear movement
+			var angular_move = penetration * (this.__angularInertia[0] / total_inertia);
+			var linear_move = penetration * (this.__linearInertia[0] / total_inertia);
+			//Limit angular move to avoid too big projections
+			var projection = this.normal.scale(-this.relativeContactPositions[0].dotProduct(this.normal), this.__helperVector).add(this.relativeContactPositions[0]);
+			var max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
+			var target_angular_direction;
+			
+			if (angular_move < -max_magnitude) {
+				total_move = angular_move + linear_move;
+				angular_move = -max_magnitude;
+				linear_move = total_move - angular_move;
+			} else if (angular_move > max_magnitude) {
+				total_move = angular_move + linear_move;
+				angular_move = max_magnitude;
+				linear_move = total_move - angular_move;
+			}
+
+			if (angular_move === 0) {
+				angular_change[0].zero();
+			} else {
+				//Get the direction we need to rotate in
+				target_angular_direction = this.normal.crossProduct(this.relativeContactPositions[0], this.__helperVector);
+				this.bodies[0].inverseInertiaTensorWorld.transformVector(target_angular_direction).scale(angular_move / this.__angularInertia[0]).clone(angular_change[0]);
+			}
+
+			this.normal.scale(linear_move, linear_change[0]);
+			//Apply the calculated changes
+			this.bodies[0].position.add(linear_change[0]);
+			this.bodies[0].orientation.addVector(angular_change[0]);
+			//Update the asleep bodies
+			if (!this.bodies[0].isAwake) this.bodies[0].calculateInternalData();
+
+			if (this.bodies[1] !== null && this.bodies[1] !== undefined) {
+				//Calculate angular and linear movement
+				angular_move = -penetration * (this.__angularInertia[1] / total_inertia);
+				linear_move = -penetration * (this.__linearInertia[1] / total_inertia);
+				//Limit angular move to avoid too big projections
+				projection = this.normal.scale(-this.relativeContactPositions[1].dotProduct(this.normal), this.__helperVector).add(this.relativeContactPositions[1]);
+				max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
+			
+				if (angular_move < -max_magnitude) {
+					total_move = angular_move + linear_move;
+					angular_move = -max_magnitude;
+					linear_move = total_move - angular_move;
+				} else if (angular_move > max_magnitude) {
+					total_move = angular_move + linear_move;
+					angular_move = max_magnitude;
+					linear_move = total_move - angular_move;
+				}
+
+				if (angular_move === 0) {
+					angular_change[1].zero();
+				} else {
+					target_angular_direction = this.normal.crossProduct(this.relativeContactPositions[1], this.__helperVector);
+					this.bodies[1].inverseInertiaTensorWorld.transformVector(target_angular_direction).scale(angular_move / this.__angularInertia[1]).clone(angular_change[1]);
+				}
+
+				this.normal.scale(linear_move, linear_change[1]);
+				////Apply the calculated changes
+				this.bodies[1].position.add(linear_change[1]);
+				this.bodies[1].orientation.addVector(angular_change[1]);
+				if (!this.bodies[1].isAwake) this.bodies[1].calculateInternalData();
+			}
+		};
+
 		/**
-		Performs a inertia weighted impulse resolution of this contact.
-		@param {Array} velocity_change Array holding the velocity change for each body.
-		@param {Array} rotation_change Array holding the rotation change for each body.
+			Performs a inertia weighted impulse resolution of this contact.
+			@param {Array} velocity_change Array holding the velocity change for each body.
+			@param {Array} rotation_change Array holding the rotation change for each body.
 		*/
-		/*Contact.prototype.resolveVelocity = function(velocity_change, rotation_change) {
-		var delta_velocity, delta_velocity_world, impulse, impulsive_torque;
-		impulse = new Math.Vector3D();
-		if (this.friction === 0) {
-		delta_velocity_world = this.normal.crossProduct(this.relativeContactPositions[0], new Math.Vector3D());
-		delta_velocity_world.transformByMatrix(this.bodies[0].inverseInertialTensorWorld);
-		this.relativeContactPositions[0].crossProduct(delta_velocity_world, delta_velocity_world);
-		delta_velocity = delta_velocity_world.dotProduct(this.normal);
-		delta_velocity += this.bodies[0].inverseMass;
-		if (this.bodies[1] != null) {
-		delta_velocity_world = this.normal.crossProduct(this.relativeContactPositions[1], new Math.Vector3D());
-		delta_velocity_world.transformByMatrix(this.bodies[1].inverseInertialTensorWorld);
-		this.relativeContactPositions[1].crossProduct(delta_velocity_world, delta_velocity_world);
-		delta_velocity += delta_velocity_world.dotProduct(this.normal);
-		delta_velocity += this.bodies[1].inverseMass;
-		}
-		impulse.set(this.desiredDeltaVelocity / delta_velocity, 0, 0);
-		}
+		Contact.prototype.resolveVelocity = function(velocity_change, rotation_change) {
+			if (this.friction === 0) {
+				//Calculate frictionless impulse in contact coordinates
+				//First we calculate the vector showing the velocity change in world space in the contact normal direction
+				delta_velocity_world = this.relativeContactPositions[0].crossProduct(this.normal, this.__helperVector);
+				this.bodies[0].inverseInertiaTensorWorld.transformVector(delta_velocity_world);
+				delta_velocity_world.crossProduct(this.relativeContactPositions[0]);
+				//Calculate the change in velocity in contact coordinates
+				var delta_velocity = delta_velocity_world.dotProduct(this.normal);
+				delta_velocity += this.bodies[0].inverseMass;
 
-		impulse.transformByMatrix(this.toWorld);
-		impulsive_torque = impulse.crossProduct(this.relativeContactPositions[0], new Math.Vector3D());
-		impulsive_torque.transformByMatrix(this.bodies[0].inverseInertialTensorWorld, rotation_change[0]);
-		impulse.scale(this.bodies[0].inverseMass, velocity_change[0]);
-		this.bodies[0].rotation.add(rotation_change[0]);
-		this.bodies[0].velocity.add(velocity_change[0]);
-		if (this.bodies[1] != null) {
-		impulse.scale(-1);
-		impulse.crossProduct(this.relativeContactPositions[1], impulsive_torque);
-		impulsive_torque.transformByMatrix(this.bodies[1].inverseInertialTensorWorld, rotation_change[1]);
-		impulse.scale(this.bodies[1].inverseMass, velocity_change[1]);
-		this.bodies[1].rotation.add(rotation_change[1]);
-		this.bodies[1].velocity.add(velocity_change[1]);
-		}
+				if (this.bodies[1] !== null && this.bodies !== undefined) {
+					//Do the same for the second body
+					delta_velocity_world = this.relativeContactPositions[1].crossProduct(this.normal, this.__helperVector);
+					this.bodies[1].inverseInertiaTensorWorld.transformVector(delta_velocity_world);
+					delta_velocity_world.crossProduct(this.relativeContactPositions[1]);
+					//Add the change in velocity
+					delta_velocity += delta_velocity_world.dotProduct(this.normal);
+					delta_velocity += this.bodies[1].inverseMass;
+				}
 
-		};*/
+				//Calculate the required size of the impulse
+				this.__impulse.set(this.desiredDeltaVelocity / delta_velocity, 0, 0);
+			} else {
+				this.__impulse.zero();
+			}
+
+			//Convert impulse to world coordinatees
+			this.toWorld.transformVector(this.__impulse);
+			//Split the impulse into linear and rotational elements
+			var impulsive_torque = this.relativeContactPositions[0].crossProduct(this.__impulse, this.__helperVector);
+			this.bodies[0].inverseInertiaTensorWorld.transformVector(impulsive_torque, rotation_change[0]);
+			console.log(impulsive_torque, rotation_change[0]);
+			this.__impulse.scale(this.bodies[0].inverseMass, velocity_change[0]);
+			//Apply the changes
+			this.bodies[0].angular_velocity.add(rotation_change[0]);
+			this.bodies[0].velocity.add(velocity_change[0]);
+
+			if (this.bodies[1] !== null && this.bodies[1] !== undefined) {
+				//We need the negative impulse
+				this.__impulse.scale(-1);
+				//Split the impulse into linear and rotational elements
+				this.relativeContactPositions[1].crossProduct(this.__impulse, impulsive_torque);
+				this.bodies[1].inverseInertiaTensorWorld.transformVector(impulsive_torque, rotation_change[1]);
+				this.__impulse.scale(this.bodies[1].inverseMass, velocity_change[1]);
+				//Apply changes
+				this.bodies[1].angular_velocity.add(rotation_change[1]);
+				this.bodies[1].velocity.add(velocity_change[1]);
+			}
+		};
 		
 		/**
 			@static
