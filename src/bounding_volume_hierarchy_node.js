@@ -79,7 +79,7 @@ define(["goom-math", "./bounding_sphere", "./rigid_body"], function(Mathematics,
 			if (!this.overlaps(other) || limit === 0) return 0;
 			//If both nodes are leaf nodes, their bodies are potentially in contact.
 			if (this.isLeaf() && other.isLeaf()) {
-				contacts.push([this.body, other.body]); 
+				contacts.push([this.body, other.body]);
 				//TODO: There has to be a better way to store this than creating an array per contact.
 				return 1;
 			}
@@ -138,7 +138,7 @@ define(["goom-math", "./bounding_sphere", "./rigid_body"], function(Mathematics,
 
 		/**
 			Frees this node, depending on the second value all the nodes down the tree will be dereferenced (which should be freed from memory when the garbage collector kicks in).
-			@param {Boolean} [reestructure_tree=true] Wether the tree should be automatically reestrucutred or not, only applies when the node is 
+			@param {Boolean} [reestructure_tree=true] Wether the tree should be automatically reestrucutred or not, only applies when the node is
 			not a root node.
 		*/
 		BoundingVolumeHierarchyNode.prototype.free = function(reestructure_tree) {
@@ -178,7 +178,7 @@ define(["goom-math", "./bounding_sphere", "./rigid_body"], function(Mathematics,
 		};
 
 		/**
-			This method should be called when the position of the bounding volume has changed, it will move the node to the 
+			This method should be called when the position of the bounding volume has changed, it will move the node to the
 			proper level if it is necessary.
 		*/
 		BoundingVolumeHierarchyNode.prototype.updateHierarchy = function() {
@@ -195,7 +195,7 @@ define(["goom-math", "./bounding_sphere", "./rigid_body"], function(Mathematics,
 
 		/**
 			Attempts to insert a node back into the hierarchy from one of the lower ends.
-			@params {Physics.RigidBody} body A rigid body to be stored in the new node. 
+			@params {Physics.RigidBody} body A rigid body to be stored in the new node.
 			@params {Physics.BoundingVolume} volume A bounding volume for the new node.
 		*/
 		BoundingVolumeHierarchyNode.prototype.reinsert = function(body, volume) {
