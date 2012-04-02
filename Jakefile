@@ -4,10 +4,10 @@ var exec = require('child_process').exec;
 var requirejs = require('requirejs');
 
 var config = {
-	baseUrl: ".",
-	name: "src/goom-physics",
+	baseUrl: "src/",
+	name: "goom-physics",
 	out: "dist/goom-physics.min.js",
-	paths: { "goom-math": "lib/goom-math" }
+	paths: { "goom-math": "../lib/goom-math" }
 };
 
 desc("This is the default task.");

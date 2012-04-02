@@ -11,7 +11,6 @@ define(["goom-math", "./contact", "./intersection_tests", "./primitives","./rigi
 			the limit, new contacts will be instantiated but not cached.
 		@property {Number} MAX_CONTACTS The max size of the cache for contacts.
 		@property {Array} contactCache An array holding the cached contacts.
-
 		@exports CollisionDetector as Physics.CollisionDetector
 	*/
 	var CollisionDetector = (function() {
