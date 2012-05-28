@@ -1,21 +1,16 @@
-if (typeof define !== 'function') {
-	var define = require('amdefine')(module);
-}
+var BodyForceRegistry = require("./body_force_registry"), BoundingSphere = require("./bounding_sphere"), BoundingVolumeHierarchyNode = require("./bounding_volume_hierarchy_node"),
+	CollisionDetector = require("./collision_detector"), Contact = require("./contact"), ForceGenerator = require("./force_generator"),
+	Gravity = require("./gravity"),  IntersectionTests = require("./intersection_tests"), Primitives = require("./primitives"),
+	RigidBody = require("./rigid_body"), World = require("./world");
 
-define(["./body_force_registry", "./bounding_sphere", "./bounding_volume_hierarchy_node", "./collision_detector", "./contact",
-		"./force_generator", "./gravity", "./intersection_tests", "./primitives", "./rigid_body"],
-		function(BodyForceRegistry, BoundingSphere, BoundingVolumeHierarchyNode, CollisionDetector, Contact,
-			ForceGenerator, Gravity, IntersectionTests, Primitives, RigidBody) {
-	Physics = {};
-	Physics.BodyForceRegistry = BodyForceRegistry;
-	Physics.BoundingSphere = BoundingSphere;
-	Physics.BoundingVolumeHierarchyNode = BoundingVolumeHierarchyNode;
-	Physics.CollisionDetector = CollisionDetector;
-	Physics.Contact = Contact;
-	Physics.ForceGenerator = ForceGenerator;
-	Physics.Gravity = Gravity;
-	Physics.IntersectionTests = IntersectionTests;
-	Physics.Primitives = Primitives;
-	Physics.RigidBody = RigidBody;
-	return Physics;
-});
+exports.BodyForceRegistry = BodyForceRegistry;
+exports.BoundingSphere = BoundingSphere;
+exports.BoundingVolumeHierarchyNode = BoundingVolumeHierarchyNode;
+exports.CollisionDetector = CollisionDetector;
+exports.Contact = Contact;
+exports.ForceGenerator = ForceGenerator;
+exports.Gravity = Gravity;
+exports.IntersectionTests = IntersectionTests;
+exports.Primitives = Primitives;
+exports.RigidBody = RigidBody;
+exports.World = World;
