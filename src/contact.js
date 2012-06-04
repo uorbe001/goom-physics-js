@@ -204,40 +204,42 @@ Contact.prototype.resolvePosition = function(linear_change, angular_change, pene
 		total_inertia += this.__angularInertia[1] + this.__linearInertia[1];
 	}
 
-	//Calculate angular and linear movement
-	var angular_move = penetration * (this.__angularInertia[0] / total_inertia);
-	var linear_move = penetration * (this.__linearInertia[0] / total_inertia);
-	//Limit angular move to avoid too big projections
-	var projection = this.normal.scale(-this.relativeContactPositions[0].dotProduct(this.normal), this.__helperVector).add(this.relativeContactPositions[0]);
-	var max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
-	var target_angular_direction;
-	
-	if (angular_move < -max_magnitude) {
-		total_move = angular_move + linear_move;
-		angular_move = -max_magnitude;
-		linear_move = total_move - angular_move;
-	} else if (angular_move > max_magnitude) {
-		total_move = angular_move + linear_move;
-		angular_move = max_magnitude;
-		linear_move = total_move - angular_move;
+	if (!this.bodies[0].isStatic) {
+		//Calculate angular and linear movement
+		var angular_move = penetration * (this.__angularInertia[0] / total_inertia);
+		var linear_move = penetration * (this.__linearInertia[0] / total_inertia);
+		//Limit angular move to avoid too big projections
+		var projection = this.normal.scale(-this.relativeContactPositions[0].dotProduct(this.normal), this.__helperVector).add(this.relativeContactPositions[0]);
+		var max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
+		var target_angular_direction;
+		
+		if (angular_move < -max_magnitude) {
+			total_move = angular_move + linear_move;
+			angular_move = -max_magnitude;
+			linear_move = total_move - angular_move;
+		} else if (angular_move > max_magnitude) {
+			total_move = angular_move + linear_move;
+			angular_move = max_magnitude;
+			linear_move = total_move - angular_move;
+		}
+
+		if (angular_move === 0) {
+			angular_change[0].zero();
+		} else {
+			//Get the direction we need to rotate in
+			target_angular_direction = this.normal.crossProduct(this.relativeContactPositions[0], this.__helperVector);
+			this.bodies[0].inverseInertiaTensorWorld.transformVector(target_angular_direction).scale(angular_move / this.__angularInertia[0]).clone(angular_change[0]);
+		}
+
+		this.normal.scale(linear_move, linear_change[0]);
+		//Apply the calculated changes
+		this.bodies[0].position.add(linear_change[0]);
+		this.bodies[0].orientation.addVector(angular_change[0]);
+		//Update the asleep bodies
+		if (!this.bodies[0].isAwake) this.bodies[0].calculateInternalData();
 	}
 
-	if (angular_move === 0) {
-		angular_change[0].zero();
-	} else {
-		//Get the direction we need to rotate in
-		target_angular_direction = this.normal.crossProduct(this.relativeContactPositions[0], this.__helperVector);
-		this.bodies[0].inverseInertiaTensorWorld.transformVector(target_angular_direction).scale(angular_move / this.__angularInertia[0]).clone(angular_change[0]);
-	}
-
-	this.normal.scale(linear_move, linear_change[0]);
-	//Apply the calculated changes
-	this.bodies[0].position.add(linear_change[0]);
-	this.bodies[0].orientation.addVector(angular_change[0]);
-	//Update the asleep bodies
-	if (!this.bodies[0].isAwake) this.bodies[0].calculateInternalData();
-
-	if (this.bodies[1] !== null && this.bodies[1] !== undefined) {
+	if (this.bodies[1] !== null && this.bodies[1] !== undefined && !this.bodies[1].isStatic) {
 		//Calculate angular and linear movement
 		angular_move = -penetration * (this.__angularInertia[1] / total_inertia);
 		linear_move = -penetration * (this.__linearInertia[1] / total_inertia);
@@ -263,7 +265,7 @@ Contact.prototype.resolvePosition = function(linear_change, angular_change, pene
 		}
 
 		this.normal.scale(linear_move, linear_change[1]);
-		////Apply the calculated changes
+		//Apply the calculated changes
 		this.bodies[1].position.add(linear_change[1]);
 		this.bodies[1].orientation.addVector(angular_change[1]);
 		if (!this.bodies[1].isAwake) this.bodies[1].calculateInternalData();

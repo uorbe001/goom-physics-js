@@ -59,7 +59,7 @@ describe("Physics.World", function() {
 		that = this;
 		expect(this.world.boundingVolumeHierarchy !== null).toBeFalsy();
 		body = this.world.addBody({
-			"static": false,
+			"static": true,
 			"position": {"x": 0, "y": 0, "z": 0},
 			"orientation": {"r": 1, "i": 0, "j": 0, "k": 0},
 			"weight": 1,
@@ -72,8 +72,10 @@ describe("Physics.World", function() {
 				}
 		]});
 		expect(this.world.rigidBodies.length).toBe(1);
+		expect(this.world.dynamicBodies.length).toBe(0);
+
 		body2 = this.world.addBody({
-			"static": false,
+			"static": true,
 			"position": {"x": 0, "y": 0, "z": 0},
 			"orientation": {"r": 1, "i": 0, "j": 0, "k": 0},
 			"weight": 1,
@@ -87,6 +89,7 @@ describe("Physics.World", function() {
 		]});
 
 		expect(this.world.rigidBodies.length).toBe(2);
+		expect(this.world.dynamicBodies.length).toBe(0);
 		expect(body2.primitives.length).toBe(1);
 		expect(body2.primitives[0] instanceof Primitives.Sphere).toBeTruthy();
 		expect(body2.primitives[0].body).toBe(body2);
@@ -107,6 +110,7 @@ describe("Physics.World", function() {
 		]});
 
 		expect(this.world.rigidBodies.length).toBe(3);
+		expect(this.world.dynamicBodies.length).toBe(1);
 		expect(body3.primitives.length).toBe(1);
 		expect(body3.primitives[0] instanceof Primitives.Box).toBeTruthy();
 		expect(body3.primitives[0].body).toBe(body3);

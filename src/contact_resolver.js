@@ -72,23 +72,23 @@ ContactResolver.prototype.resolve = function(contacts, duration) {
 		for (j = 0, len2 = contacts.length; j < len2; j++) {
 			contact = contacts[j];
 
-			if (contact.bodies[0] === chosen_contact.bodies[0]) {
+			if ((contact.bodies[0] === chosen_contact.bodies[0]) && (!contact.bodies[0].isStatic)) {
 				delta_position = this.__linearChange[0].add(this.__angularChange[0].crossProduct(contact.relativeContactPositions[0], this.__helperVector), this.__helperVector);
 				contact.penetration += delta_position.dotProduct(contact.normal.scale(-1, this.__helperVector2));
 			}
 
-			if (contact.bodies[0] === chosen_contact.bodies[1]) {
+			if ((contact.bodies[0] === chosen_contact.bodies[1]) && (!contact.bodies[0].isStatic)) {
 				delta_position = this.__linearChange[1].add(this.__angularChange[1].crossProduct(contact.relativeContactPositions[0], this.__helperVector), this.__helperVector);
 				contact.penetration += delta_position.dotProduct(contact.normal.scale(-1, this.__helperVector2));
 			}
 
-			if (contact.bodies[1] !== null && contact.bodies[1] !== undefined) {
+			if ((contact.bodies[1] !== null && contact.bodies[1] !== undefined) && (!contact.bodies[1].isStatic)) {
 				if (contact.bodies[1] === chosen_contact.bodies[0]) {
 					delta_position = this.__linearChange[0].add(this.__angularChange[0].crossProduct(contact.relativeContactPositions[1], this.__helperVector), this.__helperVector);
 					contact.penetration += delta_position.dotProduct(contact.normal);
 				}
 
-				if (contact.bodies[1] === chosen_contact.bodies[1]) {
+				if ((contact.bodies[1] === chosen_contact.bodies[1]) && (!contact.bodies[1].isStatic)) {
 					delta_position = this.__linearChange[1].add(this.__angularChange[1].crossProduct(contact.relativeContactPositions[1], this.__helperVector), this.__helperVector);
 					contact.penetration += delta_position.dotProduct(contact.normal);
 				}

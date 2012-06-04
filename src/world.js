@@ -7,6 +7,7 @@ var BodyForceRegistry = require("./body_force_registry"), CollisionDetector = re
 	registry. Will also be used to run the physics simulations.
 	@exports World as Physics.World
 	@property {Array} rigidBodies The array with the different rigid bodies in the world.
+	@property {Array} dynamicBodies The array holding the dynamic bodies in the world.
 	@property {Array} planes The array with the different planes in the world.
 	@property {BodyForceRegistry} registry The registry holding all the rigid body and force
 	generator pairs.
@@ -16,6 +17,7 @@ var BodyForceRegistry = require("./body_force_registry"), CollisionDetector = re
 */
 function World() {
 	this.rigidBodies = [];
+	this.dynamicBodies = [];
 	this.planes = [];
 	this.registry = new BodyForceRegistry();
 	this.collisionDetector = new CollisionDetector();
@@ -34,8 +36,8 @@ World.prototype.update = function(duration) {
 	this.registry.updateForces(duration);
 
 	//Integrate the bodies
-	for (var i = 0, len = this.rigidBodies.length; i < len; i++) {
-		body = this.rigidBodies[i];
+	for (var i = 0, len = this.dynamicBodies.length; i < len; i++) {
+		body = this.dynamicBodies[i];
 		body.integrate(duration);
 	}
 
@@ -55,8 +57,8 @@ World.prototype.update = function(duration) {
 	//Check against the world boundaries
 	for (i = 0, len = this.planes.length; i < len; i++) {
 		plane = this.planes[i];
-		for (j = 0, len2 = this.rigidBodies.length; j < len2; j++) {
-			body = this.rigidBodies[j];
+		for (j = 0, len2 = this.dynamicBodies.length; j < len2; j++) {
+			body = this.dynamicBodies[j];
 			this.collisionDetector.checkForContactsWithPlane(body, plane, data, this.__contacts);
 		}
 	}
@@ -85,6 +87,7 @@ World.prototype.addBody = function(data) {
 	if (data.inerial_tensor) body.setInertiaTensorCoefficients(data.inerial_tensor[0], data.inerial_tensor[1], data.inerial_tensor[2]);
 	//Add the body to the rigid body list.
 	this.rigidBodies.push(body);
+	if (!body.isStatic) this.dynamicBodies.push(body);
 
 	//This part only applies to bodies with primitives.
 	if (!data.primitives) return body;

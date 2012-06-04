@@ -297,7 +297,7 @@ RigidBody.prototype.integrate = function(duration) {
 	this.orientation.addVector(this.angular_velocity.scale(duration, this.__helperVector));
 	//Update derived data
 	this.calculateInternalData();
-	//Mark as dirty and notify objservers.
+	//Mark as dirty and notify observers.
 	this.isDirty = true;
 	this.onUpdate();
 };
