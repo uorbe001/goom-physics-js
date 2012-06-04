@@ -259,4 +259,16 @@ describe("RigidBody", function() {
 		expect(body2.primitives[0].body).toBe(body2);
 		expect(body2.primitives[1].body).toBe(body2);
 	});
+
+	it("should register a callback correctly and call it when the integration step updates the body", function () {
+		this.body.angular_velocity.set(1, 1, 1);
+		this.body.setMass(1);
+		this.body.accumulatedForce.set(1, 1, 1);
+		this.body.integrate(1);
+		this.callback = jasmine.createSpy();
+		var obj = {};
+		this.body.listenToUpdates(obj, this.callback);
+		this.body.onUpdate();
+		expect(this.callback).toHaveBeenCalledWith(obj, this.body);
+	});
 });

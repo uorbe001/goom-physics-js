@@ -147,4 +147,26 @@ describe("Physics.World", function() {
 		expect(this.world.planes[2].normal.y).toBe(0);
 		expect(this.world.planes[2].normal.z).toBe(1);
 	});
+
+	it("should return the body by id and null when it is not found", function() {
+		var body = this.world.addBody({
+			"id": "body1",
+			"static": false,
+			"position": {"x": 0, "y": 0, "z": 0},
+			"orientation": {"r": 1, "i": 0, "j": 0, "k": 0},
+			"weight": 1,
+			"inertial_tensor": [1/12, 1/12, 1/12],
+			"primitives": [
+				{
+					"type": "box",
+					"halfSize": {"x": 1, "y": 1, "z": 1},
+					"offset":  [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1]
+				}
+		]});
+
+		var body2 = this.world.findBody("body1");
+		expect(body2).toBe(body);
+		body2 = this.world.findBody("a1");
+		expect(body2).toBeNull();
+	});
 });

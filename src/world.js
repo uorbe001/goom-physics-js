@@ -77,6 +77,7 @@ World.prototype.update = function(duration) {
 World.prototype.addBody = function(data) {
 	var body = new RigidBody();
 	//Set data
+	if (data.id) body.id = data.id;
 	if (data.static) body.isStatic = true;
 	if (data.position) body.position.set(data.position.x, data.position.y, data.position.z);
 	if (data.orientation) body.orientation.set(data.orientation.r, data.orientation.i, data.orientation.j, data.orientation.k);
@@ -99,6 +100,20 @@ World.prototype.addBody = function(data) {
 		this.boundingVolumeHierarchy = new BoundingVolumeHierarchyNode(null, body, bounding_sphere);
 
 	return body;
+};
+
+
+/**
+	Returns the body with the given id.
+	@param {String} id The id of the body to look for.
+	@returns The body with the given id, null if not found.
+*/
+World.prototype.findBody = function(id) {
+	for (var i = this.rigidBodies.length - 1; i >= 0; i--) {
+		if (this.rigidBodies[i].id === id) return this.rigidBodies[i];
+	}
+
+	return null;
 };
 
 /**

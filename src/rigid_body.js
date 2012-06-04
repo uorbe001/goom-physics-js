@@ -27,6 +27,10 @@ var Mathematics = require("goom-math"), Primitives = require("./primitives");
 	@property {Boolean} isStatic If this is true the rigid body won't move.
 	@property {Mathematics.Vector3D} __helperVector This vector is used in a few functions as a local variable,
 		it is defined as a class variable to avoid the creation of objects at runtime.
+	@property {Array} listeners Objects listening to this rigid body for updates.
+	@property {Array} callbacks Callbacks to be called with each rigid body on updates.
+	@property {String} id used to identify the rigid body instance.
+	@property {Boolean} isDirty if this flag is true, the body has been modified in the last update.
 	@param {Mathematics.Vector3D} [position=(0,0,0)] The position of the object in world space.
 	@param {Mathematics.Quaternion} [orientation=(1,0,0,0)] Angular orientation of the body.
 	@param {Mathematics.Vector3D} [velocity=(0,0,0)] The velocity of the rigid body in world space.
@@ -48,9 +52,13 @@ function RigidBody(position, orientation, velocity, angular_velocity) {
 	this.isAwake = true;
 	this.canSleep = true;
 	this.isStatic = false;
+	this.isDirty = false;
 	this.motion = 0;
 	this.boundingVolumeHierarchyNode = null;
+	this.id = null;
 	this.primitives = [];
+	this.listeners = [];
+	this.callbacks = [];
 	this.calculateInternalData();
 	this.__helperVector = new Mathematics.Vector3D();
 }
@@ -191,6 +199,25 @@ RigidBody.prototype.setMass = function(mass) {
 };
 
 /**
+	Sets a callback and the object to be called when the rigid body state is updated.
+	@param object to be passed as first parameter to the callback.
+	@param {Function} callback The callback to be called when the body is updated.
+*/
+RigidBody.prototype.listenToUpdates = function(object, callback) {
+	this.listeners.push(object);
+	this.callbacks.push(callback);
+};
+
+/**
+	@inner Ntifies all the objects listening for updates.
+*/
+RigidBody.prototype.onUpdate = function() {
+	for (var i = this.callbacks.length - 1; i >= 0; i--) {
+		this.callbacks[i](this.listeners[i], this);
+	}
+};
+
+/**
 	Adds and creates a primitive from the given description.
 	@param primitive_data A json object or an array of json objects describing the primitive to be added.
 	@throws An exception when the primitive type is not known.
@@ -232,6 +259,7 @@ RigidBody.prototype.addPrimitives = function(primitive_data) {
 	@param {Number} duration The ammount of time to step forward.
 */
 RigidBody.prototype.integrate = function(duration) {
+	this.isDirty = false;
 	if (!this.isAwake || this.isStatic) return;
 
 	//Calculate linear acceleration
@@ -269,6 +297,9 @@ RigidBody.prototype.integrate = function(duration) {
 	this.orientation.addVector(this.angular_velocity.scale(duration, this.__helperVector));
 	//Update derived data
 	this.calculateInternalData();
+	//Mark as dirty and notify objservers.
+	this.isDirty = true;
+	this.onUpdate();
 };
 
 /**
