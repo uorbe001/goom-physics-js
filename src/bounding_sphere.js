@@ -83,6 +83,69 @@ BoundingSphere.prototype.fitSpheres = function(sphere_one, sphere_two) {
 };
 
 /**
+	Grows this sphere to enclose the primitives described in the given data.
+	@param {JSON} primitives_data Data describing the primitives to enclose.
+*/
+BoundingSphere.prototype.fitPrimitives = function (primitives_data) {
+	var primitive_data, distance, x, y, z;
+
+	for (var i = 0, len = primitives_data.length; i < len; i++) {
+		primitive_data = primitives_data[i];
+		
+		if (primitive_data.type == "box") {
+			var multipliers = [[1, 1, 1], [-1, 1, 1], [1, -1, 1], [-1, -1, 1], [1, 1, -1], [-1, 1, -1], [1, -1, -1], [-1, -1, -1]];
+			var furthest_vertex, furthest_vertex_distance = 0;
+			//Go through the different vertices
+			for (i = 0; i <= 7; i++) {
+				var transformationMatrix = new Mathematics.Matrix4D();
+				if (primitive_data.offset) transformationMatrix.set(primitive_data.offset);
+				var vertex_position = new Mathematics.Vector3D();
+				vertex_position.set(multipliers[i][0], multipliers[i][1], multipliers[i][2]);
+				vertex_position.componentProduct(primitive_data.halfSize);
+				transformationMatrix.transformVector(vertex_position);
+				distance = vertex_position.substract(this.position).magnitude();
+				if (furthest_vertex_distance < distance) {
+					furthest_vertex = vertex_position;
+					furthest_vertex_distance = distance;
+				}
+			}
+
+			if (this.radious < furthest_vertex_distance)
+				this.radious = furthest_vertex_distance;
+			continue;
+		}
+
+		if (primitive_data.type == "sphere") {
+			if (this.radious === 0) {
+				x = (primitive_data.offset && primitive_data.offset[12]?primitive_data.offset[12]:0) - this.position.x,
+					y = (primitive_data.offset && primitive_data.offset[13]?primitive_data.offset[13]:0) - this.position.y,
+					z = (primitive_data.offset && primitive_data.offset[14]?primitive_data.offset[14]:0) - this.position.z;
+				distance = x * x + y * y + z * z;
+				this.radious = primitive_data.radious + distance;
+			} else {
+				x = this.position.x - primitive_data.position.x,
+					y = this.position.y - primitive_data.position.y,
+					z = this.position.z - primitive_data.position.z;
+				distance = x * x + y * y + z * z;
+				var radious_diff = this.radious - primitive_data.radious;
+
+				if ((radious_diff * radious_diff) >= distance) {
+					if (primitive_data.radious > this.radious) {
+						this.radious = primitive_data.radious;
+					}
+				} else {
+					distance = Math.sqrt(distance);
+					if (((distance + primitive_data.radious + this.radious) * 0.5) > this.radious)
+						this.radious = (distance + primitive_data.radious + this.radious) * 0.5;
+				}
+			}
+
+			continue;
+		}
+	}
+};
+
+/**
 	Checks wether this sphere and the given sphere are overlapping.
 	@param {Physics.BoundingSphere} sphere The sphere to check overlapping against.
 	@returns {Boolean} True if the spheres are overlapping, false otherwise.

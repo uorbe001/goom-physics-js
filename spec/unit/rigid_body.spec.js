@@ -109,9 +109,6 @@ describe("RigidBody", function() {
 		expect(this.body.accumulatedTorque.y).toBe(0);
 		expect(this.body.accumulatedTorque.z).toBe(2);
 		expect(this.body.wakeUp).toHaveBeenCalled();
-		//TODO: Not sure if this is right.
-		//TODO: Not sure if this is right.
-		//TODO: Test different forces and positions!
 	});
 
 	it("should update force to the accumulatedForce and accumulatedTorque and wake the body up when the force is applied at a body point", function() {
@@ -134,8 +131,6 @@ describe("RigidBody", function() {
 		expect(this.body.accumulatedTorque.y).toBe(0);
 		expect(this.body.accumulatedTorque.z).toBe(2);
 		expect(this.body.wakeUp).toHaveBeenCalled();
-		//TODO: Not sure if this is right.
-		//TODO: Test different forces and positions!
 	});
 
 	it("should add the torque to the accumulated torque and wake the body up when applyTorque is called", function() {

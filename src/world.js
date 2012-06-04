@@ -1,4 +1,6 @@
-var BodyForceRegistry = require("./body_force_registry"), CollisionDetector = require("./collision_detector"), ContactResolver = require("./contact_resolver"), BoundingVolumeHierarchyNode = require("./bounding_volume_hierarchy_node"), BoundingSphere = require("./bounding_sphere"), Primitives = require("./primitives"), Mathematics = require("goom-math");
+var BodyForceRegistry = require("./body_force_registry"), CollisionDetector = require("./collision_detector"), RigidBody = require("./rigid_body"),
+	ContactResolver = require("./contact_resolver"), BoundingVolumeHierarchyNode = require("./bounding_volume_hierarchy_node"),
+	BoundingSphere = require("./bounding_sphere"), Primitives = require("./primitives"), Mathematics = require("goom-math");
 /**
 	Creates a World for the physics simulation.
 	@class This class holds the different rigid bodies and the force generator/rigid body
@@ -70,29 +72,40 @@ World.prototype.update = function(duration) {
 
 /**
 	Adds a body to the list of rigid bodies in the world and if the second parameter is given, the list of primitives for that body is added.
-	@param {RigidBody} body The rigid body to add to the world.
-	@param {Number} [radious] Radious of the bounding volume sphere used for narrow phase collision detection.
-	@param {Array} [primitives] An array or a single element describing primitives related to this body. If this param is not given, the body will not collide with anything.
+	@param {JSON} data A description of the body.
 */
-World.prototype.addBody = function(body, radious, primitives) {
+World.prototype.addBody = function(data) {
+	var body = new RigidBody();
+	//Set data
+	if (data.static) body.isStatic = true;
+	if (data.position) body.position.set(data.position.x, data.position.y, data.position.z);
+	if (data.orientation) body.orientation.set(data.orientation.r, data.orientation.i, data.orientation.j, data.orientation.k);
+	if (data.weight) body.setMass(data.weight);
+	if (data.inerial_tensor) body.setInertiaTensorCoefficients(data.inerial_tensor[0], data.inerial_tensor[1], data.inerial_tensor[2]);
+	//Add the body to the rigid body list.
 	this.rigidBodies.push(body);
-	//If we have a radious, create a BVH node and add a bounding sphere with the body to it
-	if ((radious !== null && radious !== undefined) && (this.boundingVolumeHierarchy !== null && this.boundingVolumeHierarchy !== undefined)) {
-		this.boundingVolumeHierarchy.insert(body, new BoundingSphere(body.position, radious));
-	} else if (radious !== null && radious !== undefined) {
-		this.boundingVolumeHierarchy = new BoundingVolumeHierarchyNode(null, body, new BoundingSphere(body.position, radious));
-	}
 
-	//No need to keep going if there is no primitives
-	if (primitives === null || primitives === undefined) return;
-	body.addPrimitives(primitives);
+	//This part only applies to bodies with primitives.
+	if (!data.primitives) return body;
+
+	body.addPrimitives(data.primitives);
+	var bounding_sphere = new BoundingSphere(body.position, 0);
+	bounding_sphere.fitPrimitives(data.primitives);
+
+	//Create a BVH node and add a bounding sphere with the body to it
+	if (this.boundingVolumeHierarchy !== null && this.boundingVolumeHierarchy !== undefined)
+		this.boundingVolumeHierarchy.insert(body, bounding_sphere);
+	else
+		this.boundingVolumeHierarchy = new BoundingVolumeHierarchyNode(null, body, bounding_sphere);
+
+	return body;
 };
 
 /**
 	Adds a half plane to the physics world, all rigid bodies will be checked against it per frame.
 	@param {Array} data An array or a single element describing the plane.
 */
-World.prototype.addPlane = function(data) {
+World.prototype.addPlanes = function(data) {
 	if (!(data instanceof Array)) {
 		this.planes.push(new Primitives.Plane(this, new Mathematics.Vector3D(data.normal.x, data.normal.y, data.normal.z), data.offset !== null && data.offset !== undefined ? data.offset : null));
 		return;

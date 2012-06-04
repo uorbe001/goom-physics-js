@@ -4,6 +4,7 @@ describe("Physics.ContactResolver", function() {
 	beforeEach(function() {
 		this.cr = new ContactResolver();
 		this.b1 = new RigidBody();
+		console.log("TODO: Test static bodies!");
 	});
 
 	it("should resolve contacts(?)", function() {

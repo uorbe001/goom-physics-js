@@ -24,6 +24,7 @@ var Mathematics = require("goom-math"), Primitives = require("./primitives");
 	@property {Array} primitives The list of primitives in this body, used for narrow phase collision detection.
 	@property {Physics.BoundingVolumeHierarchyNode} boundingVolumeHierarchyNode BVHNodes are used in broad-phase
 	collision detection, rigid bodies will hold a reference to the one holding them in order to notify them on position changes.
+	@property {Boolean} isStatic If this is true the rigid body won't move.
 	@property {Mathematics.Vector3D} __helperVector This vector is used in a few functions as a local variable,
 		it is defined as a class variable to avoid the creation of objects at runtime.
 	@param {Mathematics.Vector3D} [position=(0,0,0)] The position of the object in world space.
@@ -46,6 +47,7 @@ function RigidBody(position, orientation, velocity, angular_velocity) {
 	this.accumulatedTorque = new Mathematics.Vector3D();
 	this.isAwake = true;
 	this.canSleep = true;
+	this.isStatic = false;
 	this.motion = 0;
 	this.boundingVolumeHierarchyNode = null;
 	this.primitives = [];
@@ -230,7 +232,7 @@ RigidBody.prototype.addPrimitives = function(primitive_data) {
 	@param {Number} duration The ammount of time to step forward.
 */
 RigidBody.prototype.integrate = function(duration) {
-	if (!this.isAwake) return;
+	if (!this.isAwake || this.isStatic) return;
 
 	//Calculate linear acceleration
 	this.acceleration.clone(this.lastFrameAcceleration);

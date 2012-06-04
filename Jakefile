@@ -2,13 +2,6 @@ var sys = require('util');
 var fs = require('fs');
 var exec = require('child_process').exec;
 
-var config = {
-	baseUrl: "src/",
-	name: "goom-physics",
-	out: "dist/goom-physics.min.js",
-	paths: { "goom-math": "../lib/goom-math" }
-};
-
 desc("This is the default task.");
 task("default", function(params) {
 	//Do something.
@@ -27,6 +20,9 @@ task("build", function(params){
 	console.log("Building the project into a minified file...")
 	exec("browserify src/goom-physics.js  -o dist/goom-physics.js", function (error, stdout, stderr) {
 		sys.print(stdout);
-		console.log("The file is ready at dist/goom-physics.js");
+		if (error)
+			sys.print(stderr);
+		else
+			console.log("The file is ready at dist/goom-physics.js");
 	});
 });
