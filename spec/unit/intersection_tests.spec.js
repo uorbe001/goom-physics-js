@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), Primitives = require("../../src/primitives"), IntersectionTests = require("../../src/intersection_tests"), RigidBody = require("../../src/rigid_body");
+var Mathematics = require("goom-math-js"), Primitives = require("../../src/primitives"), IntersectionTests = require("../../src/intersection_tests"), RigidBody = require("../../src/rigid_body");
 
 describe("Physics.IntersectionTests", function() {
 	beforeEach(function() {

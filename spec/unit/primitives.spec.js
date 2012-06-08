@@ -1,4 +1,4 @@
-var Primitives = require("../../src/primitives"), RigidBody = require("../../src/rigid_body"), Mathematics = require("goom-math");
+var Primitives = require("../../src/primitives"), RigidBody = require("../../src/rigid_body"), Mathematics = require("goom-math-js");
 
 describe('Physics.Primitives.Primitive', function() {
 	it("should hold a body and its offset", function() {

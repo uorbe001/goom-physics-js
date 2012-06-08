@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math");
+var Mathematics = require("goom-math-js");
 
 /**
 	@namespace Holds interesection tests used for early-out checks.

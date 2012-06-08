@@ -1,6 +1,6 @@
 var BodyForceRegistry = require("./body_force_registry"), CollisionDetector = require("./collision_detector"), RigidBody = require("./rigid_body"),
 	ContactResolver = require("./contact_resolver"), BoundingVolumeHierarchyNode = require("./bounding_volume_hierarchy_node"),
-	BoundingSphere = require("./bounding_sphere"), Primitives = require("./primitives"), Mathematics = require("goom-math");
+	BoundingSphere = require("./bounding_sphere"), Primitives = require("./primitives"), Mathematics = require("goom-math-js");
 /**
 	Creates a World for the physics simulation.
 	@class This class holds the different rigid bodies and the force generator/rigid body

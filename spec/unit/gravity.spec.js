@@ -1,4 +1,4 @@
-var Gravity = require("../../src/gravity"), RigidBody = require("../../src/rigid_body"), Mathematics = require("goom-math");
+var Gravity = require("../../src/gravity"), RigidBody = require("../../src/rigid_body"), Mathematics = require("goom-math-js");
 
 describe('Gravity', function() {
 	beforeEach(function() {

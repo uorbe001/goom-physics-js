@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), Contact = require("../../src/contact"), RigidBody = require("../../src/rigid_body");
+var Mathematics = require("goom-math-js"), Contact = require("../../src/contact"), RigidBody = require("../../src/rigid_body");
 
 describe("Physics.Contact", function() {
 	beforeEach(function() {

@@ -1,6 +1,6 @@
 var BodyForceRegistry = require("../../src/body_force_registry"), CollisionDetector = require("../../src/collision_detector"),
 	ContactResolver = require("../../src/contact_resolver"), BoundingVolumeHierarchyNode = require("../../src/bounding_volume_hierarchy_node"),
-	BoundingSphere = require("../../src/bounding_sphere"), Primitives = require("../../src/primitives"), Mathematics = require("goom-math"),
+	BoundingSphere = require("../../src/bounding_sphere"), Primitives = require("../../src/primitives"), Mathematics = require("goom-math-js"),
 	RigidBody = require("../../src/rigid_body"), World = require("../../src/world"), Gravity = require("../../src/gravity");
 
 describe("Physics.World", function() {

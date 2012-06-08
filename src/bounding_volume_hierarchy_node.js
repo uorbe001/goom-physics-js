@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), BoundingSphere = require("./bounding_sphere");
+var Mathematics = require("goom-math-js"), BoundingSphere = require("./bounding_sphere");
 
 /**
 	Creates a new BoundingVolumeHierarchyNode.

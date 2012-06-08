@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), BoundingVolumeHierarchyNode = require("../../src/bounding_volume_hierarchy_node"), BoundingSphere = require("../../src/bounding_sphere"), RigidBody = require("../../src/rigid_body");
+var Mathematics = require("goom-math-js"), BoundingVolumeHierarchyNode = require("../../src/bounding_volume_hierarchy_node"), BoundingSphere = require("../../src/bounding_sphere"), RigidBody = require("../../src/rigid_body");
 	
 describe("Physics.BoundingVolumeHierarchyNode", function() {
 	beforeEach(function() {

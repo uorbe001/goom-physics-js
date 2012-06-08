@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), Primitives = require("./primitives");
+var Mathematics = require("goom-math-js"), Primitives = require("./primitives");
 
 /**
 	Creates a RigidBody.

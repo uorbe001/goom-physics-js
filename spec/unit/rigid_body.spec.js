@@ -1,4 +1,4 @@
-var RigidBody = require("../../src/rigid_body"), Mathematics = require("goom-math"), Primitives = require("../../src/primitives"), BoundingVolumeHierarchyNode = require("../../src/bounding_volume_hierarchy_node");
+var RigidBody = require("../../src/rigid_body"), Mathematics = require("goom-math-js"), Primitives = require("../../src/primitives"), BoundingVolumeHierarchyNode = require("../../src/bounding_volume_hierarchy_node");
 
 describe("RigidBody", function() {
 	beforeEach(function() {

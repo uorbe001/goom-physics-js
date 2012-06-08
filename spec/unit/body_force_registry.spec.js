@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), BodyForceRegistry = require("../../src/body_force_registry"), RigidBody = require("../../src/rigid_body"), Gravity = require("../../src/Gravity");
+var Mathematics = require("goom-math-js"), BodyForceRegistry = require("../../src/body_force_registry"), RigidBody = require("../../src/rigid_body"), Gravity = require("../../src/Gravity");
 
 describe('Physics.BodyForceRegistry', function() {
 	beforeEach(function() {

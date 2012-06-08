@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), BoundingSphere = require("../../src/bounding_sphere");
+var Mathematics = require("goom-math-js"), BoundingSphere = require("../../src/bounding_sphere");
 
 describe("Physics.BoundingSphere", function() {
 	beforeEach(function() {

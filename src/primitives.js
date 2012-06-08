@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math");
+var Mathematics = require("goom-math-js");
 
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
 	for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }

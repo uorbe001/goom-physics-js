@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), Contact = require("../../src/contact"), IntersectionTests = require("../../src/intersection_tests"),
+var Mathematics = require("goom-math-js"), Contact = require("../../src/contact"), IntersectionTests = require("../../src/intersection_tests"),
 	Primitives = require("../../src/primitives"), RigidBody = require("../../src/rigid_body"), CollisionDetector = require("../../src/collision_detector");
 
 describe("Physics.CollisionDetector", function() {

@@ -1,4 +1,4 @@
-var Mathematics = require("goom-math"), Contact = require("./contact"), IntersectionTests = require("./intersection_tests"), Primitives = require("./primitives");
+var Mathematics = require("goom-math-js"), Contact = require("./contact"), IntersectionTests = require("./intersection_tests"), Primitives = require("./primitives");
 
 /**
 	Creates a new CollisionDetector.
