@@ -150,6 +150,8 @@ ContactResolver.prototype.resolve = function(contacts, duration) {
 					contact.velocity.substract(contact.toWorld.transformTransposeVector(delta_velocity));
 				}
 			}
+			//TODO: Remove
+			//contact.velocity.zero();
 
 			contact.calculateDesiredDeltaVelocity(duration);
 		}

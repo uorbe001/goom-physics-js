@@ -259,7 +259,10 @@ RigidBody.prototype.addPrimitives = function(primitive_data) {
 	@param {Number} duration The ammount of time to step forward.
 */
 RigidBody.prototype.integrate = function(duration) {
-	this.isDirty = false;
+	if (this.isDirty) {
+		this.isDirty = false;
+	}
+
 	if (!this.isAwake || this.isStatic) return;
 
 	//Calculate linear acceleration
@@ -271,8 +274,8 @@ RigidBody.prototype.integrate = function(duration) {
 	this.angular_velocity.add(this.__helperVector.scale(duration));
 	this.velocity.add(this.lastFrameAcceleration.scale(duration, this.__helperVector));
 	//Impose drag
-	this.velocity.scale(Math.pow(RigidBody.LINEAR_DAMPING, duration));
-	this.angular_velocity.scale(Math.pow(RigidBody.ANGULAR_DAMPING, duration));
+	//this.velocity.scale(Math.pow(RigidBody.LINEAR_DAMPING, duration));
+	//this.angular_velocity.scale(Math.pow(RigidBody.ANGULAR_DAMPING, duration));
 	//Clear forces for the next integration step
 	this.clear();
 

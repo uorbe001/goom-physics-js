@@ -42,9 +42,10 @@ World.prototype.update = function(duration) {
 	}
 
 	//Look up the bvh for potential contacts (broad-phase detection)
-	this.boundingVolumeHierarchy.potentialContacts(this.__potentialContacts);
+	if (this.boundingVolumeHierarchy)
+		this.boundingVolumeHierarchy.potentialContacts(this.__potentialContacts);
 	//TODO: Contact restitution and friction data CANNOT be hardcoded. This is just a temporary thing.
-	data = {restitution: 0, friction: 0};
+	data = {restitution: 0, friction: 1};
 
 	var potential_contact;
 	//Check each potential contact (narrow-phase detection)

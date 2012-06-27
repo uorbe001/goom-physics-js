@@ -181,7 +181,7 @@ Contact.prototype.calculateInternalData = function(duration) {
 	@param {Number} penetration Ammount of penetration to resolve.
 */
 Contact.prototype.resolvePosition = function(linear_change, angular_change, penetration) {
-	var total_inertia = 0, total_move = 0;
+	var total_inertia = 0, total_move = 0, angular_move, linear_move, projection, max_magnitude, target_angular_direction;
 	//Calculate intertia of the first body
 	var angular_inertia_world = this.relativeContactPositions[0].crossProduct(this.normal, this.__helperVector);
 	this.bodies[0].inverseInertiaTensorWorld.transformVector(angular_inertia_world);
@@ -206,12 +206,11 @@ Contact.prototype.resolvePosition = function(linear_change, angular_change, pene
 
 	if (!this.bodies[0].isStatic) {
 		//Calculate angular and linear movement
-		var angular_move = penetration * (this.__angularInertia[0] / total_inertia);
-		var linear_move = penetration * (this.__linearInertia[0] / total_inertia);
+		angular_move = penetration * (this.__angularInertia[0] / total_inertia);
+		linear_move = penetration * (this.__linearInertia[0] / total_inertia);
 		//Limit angular move to avoid too big projections
-		var projection = this.normal.scale(-this.relativeContactPositions[0].dotProduct(this.normal), this.__helperVector).add(this.relativeContactPositions[0]);
-		var max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
-		var target_angular_direction;
+		projection = this.normal.scale(-this.relativeContactPositions[0].dotProduct(this.normal), this.__helperVector).add(this.relativeContactPositions[0]);
+		max_magnitude = Contact.ANGULAR_LIMIT * projection.magnitude();
 		
 		if (angular_move < -max_magnitude) {
 			total_move = angular_move + linear_move;
@@ -234,9 +233,12 @@ Contact.prototype.resolvePosition = function(linear_change, angular_change, pene
 		this.normal.scale(linear_move, linear_change[0]);
 		//Apply the calculated changes
 		this.bodies[0].position.add(linear_change[0]);
-		this.bodies[0].orientation.addVector(angular_change[0]);
+		//this.bodies[0].orientation.addVector(angular_change[0]);
 		//Update the asleep bodies
 		if (!this.bodies[0].isAwake) this.bodies[0].calculateInternalData();
+		//TODO: change this
+		angular_change[0].zero();
+		angular_change[1].zero();
 	}
 
 	if (this.bodies[1] !== null && this.bodies[1] !== undefined && !this.bodies[1].isStatic) {
@@ -267,7 +269,7 @@ Contact.prototype.resolvePosition = function(linear_change, angular_change, pene
 		this.normal.scale(linear_move, linear_change[1]);
 		//Apply the calculated changes
 		this.bodies[1].position.add(linear_change[1]);
-		this.bodies[1].orientation.addVector(angular_change[1]);
+		//this.bodies[1].orientation.addVector(angular_change[1]);
 		if (!this.bodies[1].isAwake) this.bodies[1].calculateInternalData();
 	}
 };
@@ -309,7 +311,7 @@ Contact.prototype.resolveVelocity = function(velocity_change, rotation_change) {
 	//Split the impulse into linear and rotational elements
 	var impulsive_torque = this.relativeContactPositions[0].crossProduct(this.__impulse, this.__helperVector);
 	this.bodies[0].inverseInertiaTensorWorld.transformVector(impulsive_torque, rotation_change[0]);
-	console.log(impulsive_torque, rotation_change[0]);
+
 	this.__impulse.scale(this.bodies[0].inverseMass, velocity_change[0]);
 	//Apply the changes
 	this.bodies[0].angular_velocity.add(rotation_change[0]);
@@ -331,6 +333,7 @@ Contact.prototype.resolveVelocity = function(velocity_change, rotation_change) {
 	this.bodies[0].angular_velocity.substract(this.bodies[0].angular_velocity);
 	this.bodies[0].velocity.clone(velocity_change[0]).scale(-1);
 	this.bodies[0].velocity.substract(this.bodies[0].velocity);
+
 	if (this.bodies[1] !== null && this.bodies[1] !== undefined) {
 		this.bodies[1].angular_velocity.clone(rotation_change[1]).scale(-1);
 		this.bodies[1].angular_velocity.substract(this.bodies[1].angular_velocity);

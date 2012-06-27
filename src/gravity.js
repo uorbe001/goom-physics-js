@@ -20,7 +20,8 @@ var Gravity = (function() {
 	__extends(Gravity, ForceGenerator);
 
 	function Gravity(gravity) {
-		this.gravity = gravity;
+		this.gravity = new Mathematics.Vector3D();
+		this.gravity.set(gravity.x, gravity.y, gravity.z);
 	}
 
 	/**

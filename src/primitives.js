@@ -102,7 +102,7 @@ __extends(Plane, Primitives.Primitive);
 function Plane(body, normal, offset) {
 	this.body = body;
 	this.normal = normal;
-	this.offset = offset !== null && offset !== undefined ? offset : 0;
+	this.offset = offset !== null && offset !== undefined? offset : 0;
 }
 
 /**
