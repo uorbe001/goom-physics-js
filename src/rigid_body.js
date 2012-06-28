@@ -259,11 +259,10 @@ RigidBody.prototype.addPrimitives = function(primitive_data) {
 	@param {Number} duration The ammount of time to step forward.
 */
 RigidBody.prototype.integrate = function(duration) {
-	if (this.isDirty) {
-		this.isDirty = false;
-	}
-
+	this.isDirty = false;
 	if (!this.isAwake || this.isStatic) return;
+	//Mark as dirty if it gets here
+	this.isDirty = true;
 
 	//Calculate linear acceleration
 	this.acceleration.clone(this.lastFrameAcceleration);
@@ -274,8 +273,8 @@ RigidBody.prototype.integrate = function(duration) {
 	this.angular_velocity.add(this.__helperVector.scale(duration));
 	this.velocity.add(this.lastFrameAcceleration.scale(duration, this.__helperVector));
 	//Impose drag
-	//this.velocity.scale(Math.pow(RigidBody.LINEAR_DAMPING, duration));
-	//this.angular_velocity.scale(Math.pow(RigidBody.ANGULAR_DAMPING, duration));
+	this.velocity.scale(Math.pow(RigidBody.LINEAR_DAMPING, duration));
+	this.angular_velocity.scale(Math.pow(RigidBody.ANGULAR_DAMPING, duration));
 	//Clear forces for the next integration step
 	this.clear();
 
@@ -300,8 +299,7 @@ RigidBody.prototype.integrate = function(duration) {
 	this.orientation.addVector(this.angular_velocity.scale(duration, this.__helperVector));
 	//Update derived data
 	this.calculateInternalData();
-	//Mark as dirty and notify observers.
-	this.isDirty = true;
+	//and notify observers.
 	this.onUpdate();
 };
 
